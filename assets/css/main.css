@@ -544,9 +544,7 @@ input, select, textarea {
 		-ms-transform: translate3d(0,0,0);
 		transform: translate3d(0,0,0);
 		cursor: default;
-		display: flex;
-		flex-direction: column;
-  		align-items: center;
+		display: inline-block;
 		opacity: 0;
 		position: relative;
 		text-align: center;
@@ -560,15 +558,7 @@ input, select, textarea {
 			font-weight: 900;
 			letter-spacing: -0.035em;
 			line-height: 1em;
-			margin-bottom: 0.5em;
 		}
-
-		#header .subheader {
-			  font-size: 1.25em;
-			  margin-top: 0.5em;
-			  opacity: 0.75;
-		}
-
 		#header p {
 			font-size: 1.25em;
 			margin: 0.75em 0 0.25em 0;
