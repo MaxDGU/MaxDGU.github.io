@@ -721,14 +721,14 @@ input, select, textarea {
 				
 				.download-button {
 					display: inline-block;
-					padding: 8px 15px;  /* reduced from 10px 20px */
+					padding: 10px 20px;  /* reduced from 10px 20px */
 					background-color: rgba(255, 255, 255, 0.1);
 					color: #fff;
 					text-decoration: none;
 					border: 1px solid rgba(255, 255, 255, 0.3);
-					border-radius: 4px;  /* reduced from 5px */
+					border-radius: 5px;  /* reduced from 5px */
 					font-family: Arial, sans-serif;
-					font-size: 0.9em;  /* added to make text smaller */
+					font-size: 1.2em;  /* added to make text smaller */
 					transition: all 0.3s ease;
 				}
 
