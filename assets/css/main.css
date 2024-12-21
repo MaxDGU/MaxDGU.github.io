@@ -712,24 +712,23 @@ input, select, textarea {
 
 
 				.resume-download {
-					margin-top: 20px;
+					margin-top: 10px;  /* reduced from 20px */
+					text-align: center;
+					position: relative;
+					z-index: 1;
 				}
 				
 				.download-button {
 					display: inline-block;
-					padding: 10px 20px;
+					padding: 8px 15px;  /* reduced from 10px 20px */
 					background-color: rgba(255, 255, 255, 0.1);
 					color: #fff;
 					text-decoration: none;
 					border: 1px solid rgba(255, 255, 255, 0.3);
-					border-radius: 5px;
-					font-family: Arial, sans-serif;  /* different font */
+					border-radius: 4px;  /* reduced from 5px */
+					font-family: Arial, sans-serif;
+					font-size: 0.9em;  /* added to make text smaller */
 					transition: all 0.3s ease;
-				}
-				
-				.download-button:hover {
-					background-color: rgba(255, 255, 255, 0.2);
-					border-color: rgba(255, 255, 255, 0.5);
 				}
 
 				/* Footer */
@@ -743,9 +742,9 @@ input, select, textarea {
 		background-image: linear-gradient(top, rgba(0,0,0,0), rgba(0,0,0,0.5) 75%);
 		bottom: 0;
 		cursor: default;
-		height: 6em;
+		height: 4em;
 		left: 0;
-		line-height: 8em;
+		line-height: 4em;
 		position: absolute;
 		text-align: center;
 		width: 100%;
