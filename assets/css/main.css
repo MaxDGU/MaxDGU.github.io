@@ -708,7 +708,33 @@ input, select, textarea {
 					display: none;
 				}
 
-/* Footer */
+
+
+
+				.resume-download {
+					margin-top: 20px;
+				}
+				
+				.download-button {
+					display: inline-block;
+					padding: 10px 20px;
+					background-color: rgba(255, 255, 255, 0.1);
+					color: #fff;
+					text-decoration: none;
+					border: 1px solid rgba(255, 255, 255, 0.3);
+					border-radius: 5px;
+					font-family: Arial, sans-serif;  /* different font */
+					transition: all 0.3s ease;
+				}
+				
+				.download-button:hover {
+					background-color: rgba(255, 255, 255, 0.2);
+					border-color: rgba(255, 255, 255, 0.5);
+				}
+
+				/* Footer */
+
+	
 
 	#footer {
 		background-image: -moz-linear-gradient(top, rgba(0,0,0,0), rgba(0,0,0,0.5) 75%);
