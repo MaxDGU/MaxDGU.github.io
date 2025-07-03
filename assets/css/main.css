@@ -669,9 +669,7 @@ input, select, textarea {
 					-ms-transition: color 0.2s ease-in-out;
 					transition: color 0.2s ease-in-out;
 					color: inherit;
-					display: block;
-					height: 3em;
-					line-height: 3em;
+					display: inline-block;
 				}
 
 				#header nav a:before {
