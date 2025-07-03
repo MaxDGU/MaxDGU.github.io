@@ -704,19 +704,30 @@ input, select, textarea {
 				}
 
 					#header nav a:active:before {
-						background-color: rgba(255, 255, 255, 0.35);
-						color: #fff;
+						background: rgba(255, 255, 255, 0.35);
 					}
 
 				#header nav a span {
 					display: none;
 				}
 
-				#header nav li a .ai {
-					vertical-align: -webkit-baseline-middle;
+				#header nav a[href*="scholar.google.com"] {
+					border-radius: 100%;
+					border: solid 1px;
+					display: inline-block;
+					width: 2.5em;
+					height: 2.5em;
+					line-height: 2.5em;
+					text-align: center;
+				}
+
+				#header nav a[href*="scholar.google.com"] .ai {
+					vertical-align: middle;
 				}
 
 				.resume-download {
+					border-radius: 5px;
+					padding: 10px 20px;
 					margin-top: 10px;  /* reduced from 20px */
 					text-align: center;
 					position: relative;
@@ -1124,21 +1135,3 @@ input, select, textarea {
     color: #fff;
 }
 
-#header nav a span {
-    display: none;
-}
-
-#header nav li:last-child a {
-    border-radius: 100%;
-    border: solid 1px;
-    display: inline-block;
-    width: 2.5em;
-    height: 2.5em;
-    line-height: 2.5em;
-    text-align: center;
-}
-
-#header nav li:last-child .ai {
-    font-size: 1.5em;
-    vertical-align: middle;
-}
