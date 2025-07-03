@@ -550,11 +550,13 @@ input, select, textarea {
 		text-align: center;
 		top: -1em;
 		vertical-align: middle;
-		width: 90%;
+		max-width: 90%;
+		color: #333;
+		text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
 	}
 
 		#header h1 {
-			font-size: 4.35em;
+			font-size: 4em;
 			font-weight: 900;
 			letter-spacing: -0.035em;
 			line-height: 1em;
