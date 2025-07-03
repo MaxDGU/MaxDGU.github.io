@@ -561,14 +561,14 @@ input, select, textarea {
 			letter-spacing: -0.035em;
 			line-height: 1em;
 		}
+
 		#header p {
 			font-size: 1.25em;
-			margin: 0.75em 0 0.25em 0;
-			opacity: 0.75;
+			margin: 1.5em 0 0 0;
 		}
 
 		#header nav {
-			margin: 1.5em 0 0 0;
+			margin: 2em 0 0 0;
 		}
 
 			#header nav li {
@@ -657,18 +657,21 @@ input, select, textarea {
 				}
 
 				#header nav li:nth-child(10) {
-					-moz-animation-delay: 4.75s;
-					-webkit-animation-delay: 4.75s;
-					-ms-animation-delay: 4.75s;
-					animation-delay: 4.75s;
+					-moz-animation-delay: 3.5s;
+					-webkit-animation-delay: 3.5s;
+					-ms-animation-delay: 3.5s;
+					animation-delay: 3.5s;
 				}
 
-
 				#header nav a {
-					-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-					-webkit-touch-callout: none;
-					border: 0;
-					display: inline-block;
+					-moz-transition: color 0.2s ease-in-out;
+					-webkit-transition: color 0.2s ease-in-out;
+					-ms-transition: color 0.2s ease-in-out;
+					transition: color 0.2s ease-in-out;
+					color: inherit;
+					display: block;
+					height: 3em;
+					line-height: 3em;
 				}
 
 				#header nav a:before {
@@ -710,9 +713,6 @@ input, select, textarea {
 				#header nav a span {
 					display: none;
 				}
-
-
-
 
 				.resume-download {
 					margin-top: 10px;  /* reduced from 20px */
