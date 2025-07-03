@@ -719,11 +719,10 @@ input, select, textarea {
 					height: 2.5em;
 					line-height: 2.5em;
 					text-align: center;
-				}
-
-				#header nav a[href*="scholar.google.com"] .ai {
-					vertical-align: middle;
-					font-size: 1.75em;
+					background-image: url("images/download.png");
+					background-size: 1.5em 1.5em;
+					background-repeat: no-repeat;
+					background-position: center;
 				}
 
 				.resume-download {
