@@ -723,6 +723,7 @@ input, select, textarea {
 
 				#header nav a[href*="scholar.google.com"] .ai {
 					vertical-align: middle;
+					font-size: 1.75em;
 				}
 
 				.resume-download {
