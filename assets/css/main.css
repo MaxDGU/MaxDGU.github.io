@@ -720,9 +720,10 @@ input, select, textarea {
 					line-height: 2.5em;
 					text-align: center;
 					background-image: url("images/download.png");
-					background-size: 1.5em 1.5em;
+					background-size: 1.75em 1.75em;
 					background-repeat: no-repeat;
 					background-position: center;
+					background-color: transparent;
 				}
 
 				.resume-download {
