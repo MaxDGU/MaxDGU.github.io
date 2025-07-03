@@ -557,7 +557,7 @@ input, select, textarea {
 
 		#header h1 {
 			font-size: 4em;
-			font-weight: 900;
+			font-weight: 300;
 			letter-spacing: -0.035em;
 			line-height: 1em;
 		}
@@ -1122,4 +1122,23 @@ input, select, textarea {
     margin-top: 0.5em;
     font-size: 1.1em;
     color: #fff;
+}
+
+#header nav a span {
+    display: none;
+}
+
+#header nav li:last-child a {
+    border-radius: 100%;
+    border: solid 1px;
+    display: inline-block;
+    width: 2.5em;
+    height: 2.5em;
+    line-height: 2.5em;
+    text-align: center;
+}
+
+#header nav li:last-child .ai {
+    font-size: 1.5em;
+    vertical-align: middle;
 }
