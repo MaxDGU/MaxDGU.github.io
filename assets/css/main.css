@@ -714,7 +714,7 @@ input, select, textarea {
 				#header nav a[href*="scholar.google.com"] {
 					border-radius: 100%;
 					border: solid 1px;
-					display: inline-block;
+					display: block;
 					width: 2.5em;
 					height: 2.5em;
 					line-height: 2.5em;
@@ -724,6 +724,7 @@ input, select, textarea {
 					background-repeat: no-repeat;
 					background-position: center;
 					background-color: transparent;
+					filter: invert(1) brightness(0.8) contrast(1.2);
 				}
 
 				.resume-download {
