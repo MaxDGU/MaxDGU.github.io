@@ -718,7 +718,7 @@ input, select, textarea {
 					background-repeat: no-repeat;
 					background-position: center;
 					content: "";
-					filter: brightness(0) invert(1);
+					filter: invert(1);
 				}
 
 				.resume-download {
