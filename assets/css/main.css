@@ -711,18 +711,14 @@ input, select, textarea {
 					display: none;
 				}
 
-				/* Removed Google Scholar override to use consistent icon styling */
-				
-				/* Add styles to make Academicons work with the existing icon framework */
-				#header nav a.icon .ai {
-					font-family: "academicons" !important;
-					font-size: 1.75em;
-					line-height: 1;
-				}
-
-				/* Override the :before pseudo-element for Academicons */
-				#header nav a.icon.academicons:before {
-					display: none;
+				/* Google Scholar icon with image */
+				#header nav a.icon.google-scholar:before {
+					background-image: url("images/download.png");
+					background-size: 1.5em 1.5em;
+					background-repeat: no-repeat;
+					background-position: center;
+					content: "";
+					filter: brightness(0) invert(1);
 				}
 
 				.resume-download {
