@@ -714,14 +714,14 @@ input, select, textarea {
 				/* Google Scholar icon with Unicode */
 				#header nav a.icon.google-scholar:before {
 					content: "🎓";
-					font-size: 1.5em;
-					line-height: 1;
+					font-size: 1.75em;
+					line-height: 2.5em;
 					text-align: center;
 					display: block;
-					width: 100%;
-					height: 100%;
+					width: 2.5em;
+					height: 2.5em;
 					position: relative;
-					top: 0.1em;
+					top: 0;
 				}
 
 				.resume-download {
