@@ -1,51 +1,386 @@
-<!DOCTYPE HTML>
-<html>
-	<head>
-		<title>Max's Portal</title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
-	</head>
-	<body class="is-preload">
-		<div id="wrapper">
-			<div id="bg"></div>
-			<div id="overlay"></div>
-			<div id="main">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Max Gupta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Shippori+Mincho:wght@400;600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#080B12; --night:#0E131E; --cel:#151C2B; --line:#2B3549;
+  --bone:#EDE9DF; --dim:#98A1B2; --faint:#5F6879;
+  --cyan:#7FB6D9; --amber:#D9A05B; --red:#D8452F;
 
-				<!-- Header -->
-				<header id="header" style="max-height: 80vh; overflow-y: auto;">
-					<div class="profile-picture">
-						<img src="assets/css/images/1746652643092.jpeg" alt="Max Gupta" />
-					</div>
-					<h1>Max Gupta</h1>
-					<p> Psychology &#x2715; Computer Science </p>
-					<nav>
-						<ul>
-							<li><a href="https://github.com/MaxDGU" class="icon brands fa-github"><span class="label">Github</span></a></li>
-							<li><a href="https://substack.com/@maxgupta662811?/">Writing</a></li>
-							<li><a href="https://www.linkedin.com/in/max-g-991112a5/" class="icon brands fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
-							<li><a href="https://soundcloud.com/max-gupta-777538832">Sound</a></li>
-							<li><a href="https://scholar.google.com/citations?user=8n1BqYUAAAAJ&hl=en" target="_blank" class="icon google-scholar"><span class="label">Google Scholar</span></a></li>
-						</ul>
-					</nav>
+  --spine:76px;          /* X-sheet ordinal rail */
+  --margin:104px;        /* camera-instruction column */
+  --gut:32px;
 
-					<p> Hi there! I'm Max. I'm currently at <a href="https://www.princeton.edu/">Princeton University</a>, where I work in the <a href="https://cocosci.princeton.edu/">CoCoSci lab</a> with Professor Tom Griffiths on aligning neural networks with human inductive biases. Prior to 3-years of working as a consultant and software engineer, I received my Bachelor's in mathematics from <a href="https://www.columbia.edu/">Columbia University</a></p>
-					<nav>
-						<ul style="margin-top: 1em;">
-							<li><a href="mailto:mg7411@princeton.edu">Contact Me</a></li>
-							<li><a href="assets/Max Gupta CV-2026.pdf" download="Max_Gupta_Resume.pdf">Resume</a></li>
-						</ul>
-					</nav>
-				</header>
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --disp:"Shippori Mincho",Georgia,serif;
+  --body:"Zen Kaku Gothic New",system-ui,sans-serif;
 
-			</div>
-		</div>
+  /* 11px hard floor — nothing smaller anywhere, incl. SVG <text> */
+  --t-mono:0.6875rem;
+  --t-mono-lg:0.8125rem;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--void); color:var(--bone);
+  font-family:var(--body); font-weight:400;
+  line-height:1.55; overflow-x:hidden;
+  font-synthesis-weight:none;
+}
 
-		<script>
-			window.onload = function() { document.body.classList.remove('is-preload'); }
-			window.ontouchmove = function() { return false; }
-			window.onorientationchange = function() { document.body.scrollTop = 0; }
-		</script>
-	</body>
+/* ── page frame: spine | content | margin ───────────────────── */
+.sheet{
+  display:grid;
+  grid-template-columns:var(--spine) minmax(0,1fr) var(--margin);
+  max-width:1400px; margin:0 auto;
+  position:relative;
+}
+/* the spine is a continuous rule the whole length of the document */
+.sheet::before{
+  content:""; position:absolute; top:0; bottom:0;
+  left:var(--spine); width:1px; background:var(--line);
+  z-index:2;
+}
+
+/* All three tracks share row 1. Without an explicit row the auto-placement
+   cursor passes column 2 when .margin claims column 3, dropping .col to row 2. */
+.spine,.margin,.col{grid-row:1}
+
+/* ── the ordinal rail ───────────────────────────────────────── */
+.spine{grid-column:1; position:relative}
+.spine-inner{position:sticky; top:0; height:100vh; overflow:hidden}
+.tick{
+  position:absolute; left:0; width:100%;
+  font-family:var(--mono); font-size:var(--t-mono);
+  color:var(--faint); letter-spacing:.06em;
+  padding-left:14px; line-height:1;
+}
+.tick::after{
+  content:""; position:absolute; right:0; top:.42em;
+  width:7px; height:1px; background:var(--line);
+}
+.tick.beat{color:var(--dim)}
+.tick.beat::after{width:14px;background:var(--faint)}
+
+/* ── right margin: camera instructions ──────────────────────── */
+.margin{grid-column:3; position:relative}
+.cam{
+  position:absolute; right:0; width:100%;
+  padding-left:18px;
+  font-family:var(--mono); font-size:var(--t-mono);
+  color:var(--faint); letter-spacing:.08em; text-transform:uppercase;
+  border-left:1px solid var(--line);
+}
+
+/* ── content column ─────────────────────────────────────────── */
+.col{grid-column:2; padding-left:var(--gut); padding-right:var(--gut); min-width:0}
+
+/* full-bleed escape hatch — breaks the content edge both ways */
+.bleed{
+  width:100vw; position:relative;
+  left:50%; right:50%; margin-left:-50vw; margin-right:-50vw;
+}
+
+/* ── type ───────────────────────────────────────────────────── */
+.display{
+  font-family:var(--disp); font-weight:800;
+  font-size:clamp(3.25rem,11vw,8.5rem);
+  line-height:.9; letter-spacing:-.02em;
+}
+.sec-label{
+  font-family:var(--mono); font-size:var(--t-mono-lg);
+  letter-spacing:.34em; text-transform:lowercase;
+  color:var(--dim); display:flex; align-items:baseline; gap:18px;
+}
+.sec-label::after{content:""; flex:1; height:1px; background:var(--line)}
+.mono{font-family:var(--mono); font-size:var(--t-mono); color:var(--faint); letter-spacing:.08em}
+.rule{height:1px; background:var(--line); border:0}
+
+/* ── nav ────────────────────────────────────────────────────── */
+.nav{
+  position:fixed; top:0; left:0; right:0; z-index:40;
+  display:flex; gap:26px; justify-content:flex-end;
+  padding:20px 28px;
+  font-family:var(--mono); font-size:var(--t-mono-lg);
+  letter-spacing:.16em;
+  background:linear-gradient(var(--void),rgba(8,11,18,0));
+  pointer-events:none;
+}
+.nav a{pointer-events:auto}
+a{color:var(--bone); text-decoration:none}
+.nav a{color:var(--dim)}
+.nav a:hover,a:hover{color:var(--cyan)}
+a:focus-visible,button:focus-visible{
+  outline:2px solid var(--cyan); outline-offset:3px;
+}
+
+/* ── hero + obi ─────────────────────────────────────────────── */
+.hero{min-height:88vh; display:flex; flex-direction:column; justify-content:flex-end; padding-bottom:0}
+.hero .display{margin-bottom:6vh}
+
+.obi{
+  background:var(--cel);
+  border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+  padding:22px 0;
+}
+.obi-in{
+  max-width:1400px; margin:0 auto;
+  padding-left:calc(var(--spine) + var(--gut)); padding-right:var(--gut);
+  display:flex; flex-wrap:wrap; gap:10px 44px; align-items:baseline;
+}
+.ckpt{font-family:var(--mono); font-size:var(--t-mono-lg); color:var(--dim); letter-spacing:.05em}
+.ckpt b{color:var(--bone); font-weight:500}
+.ckpt .arrow{color:var(--amber); padding:0 8px}
+.ckpt .tag{color:var(--faint)}
+.obi-in .stamp{margin-left:auto; color:var(--faint); font-family:var(--mono); font-size:var(--t-mono)}
+
+/* ── sections: deliberately unequal vertical rhythm ─────────── */
+section{position:relative}
+#work{padding-top:18vh}
+#sound{padding-top:32vh}   /* deliberate void — the fan enters clean */
+#worlds{padding-top:0}     /* butts straight against the cut */
+#writing{padding-top:24vh}
+#contact{padding-top:20vh; padding-bottom:14vh}
+
+/* placeholder fields for pass 2 grammars — real proportions, no art yet */
+.field{
+  border:1px solid var(--line); background:var(--cel);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--mono); font-size:var(--t-mono); color:var(--faint);
+  letter-spacing:.16em; text-transform:uppercase;
+}
+
+/* work: asymmetric 62/38 */
+.work-grid{display:grid; grid-template-columns:62% 38%; gap:0; margin-top:44px}
+.idx{border-right:1px solid var(--line); padding-right:34px}
+.entry{padding:20px 0; border-bottom:1px solid var(--line)}
+.entry:first-child{border-top:1px solid var(--line)}
+.entry h3{
+  font-family:var(--disp); font-weight:400;
+  font-size:clamp(1.05rem,1.9vw,1.4rem); line-height:1.32;
+  letter-spacing:.005em;
+}
+.entry .meta{
+  margin-top:9px; font-family:var(--mono); font-size:var(--t-mono);
+  color:var(--faint); letter-spacing:.1em; text-transform:uppercase;
+}
+.more{display:inline-block; margin-top:26px; font-family:var(--mono); font-size:var(--t-mono-lg); color:var(--cyan); letter-spacing:.1em}
+.probe-field{padding-left:34px}
+
+/* sound */
+.sound-field{height:min(62vh,540px); margin-top:40px}
+
+/* the hard cut */
+.cut{
+  height:100vh; background:#000;
+  display:flex; align-items:center; justify-content:center;
+  border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+}
+.cut span{
+  font-family:var(--disp); font-weight:800; color:var(--bone);
+  font-size:clamp(3rem,13vw,10rem); letter-spacing:.16em; line-height:1;
+}
+
+/* worlds: irregular plates, not a uniform 3-col */
+.plates{display:grid; grid-template-columns:repeat(12,1fr); gap:24px; margin-top:52px}
+.plate{border:1px solid var(--line); background:var(--cel); min-height:230px}
+.plate.p1{grid-column:1/7}
+.plate.p2{grid-column:8/13; margin-top:64px}
+.plate.p3{grid-column:3/12; margin-top:40px}
+
+/* writing: a printed page — narrow measure, deep margin */
+.page{max-width:34em; margin-left:auto; margin-right:6%}
+.post{display:flex; justify-content:space-between; gap:24px; padding:16px 0; border-bottom:1px solid var(--line)}
+.post h3{font-family:var(--disp); font-weight:400; font-size:1.1rem}
+
+/* contact */
+.links{display:flex; flex-wrap:wrap; gap:14px 40px; margin-top:36px; font-family:var(--mono); font-size:var(--t-mono-lg); letter-spacing:.12em}
+.links a{color:var(--cyan)}
+
+/* colophon */
+.colophon{background:var(--night); border-top:1px solid var(--line); padding:60px 0 72px}
+.colophon p{
+  max-width:38em; color:var(--dim); font-size:.9rem; line-height:1.7;
+  padding-left:calc(var(--spine) + var(--gut)); padding-right:var(--gut);
+  max-inline-size:44em; margin:0 auto; box-sizing:content-box;
+}
+
+/* ── responsive: never collapses to a plain single column ───── */
+@media (max-width:900px){
+  :root{--spine:44px; --margin:0px; --gut:18px}
+  .sheet{grid-template-columns:var(--spine) minmax(0,1fr)}
+  .margin{display:none}
+  .work-grid{grid-template-columns:1fr}
+  .idx{border-right:0; padding-right:0}
+  .probe-field{padding-left:0; margin-top:28px; min-height:260px}
+  /* plates stay irregular — offset and span, just narrower */
+  .plate.p1{grid-column:1/11}
+  .plate.p2{grid-column:4/13; margin-top:28px}
+  .plate.p3{grid-column:2/12; margin-top:28px}
+  .page{margin-right:0; max-width:none}
+  #sound{padding-top:20vh} #work{padding-top:12vh}
+  .obi-in{padding-left:calc(var(--spine) + var(--gut))}
+  .colophon p{padding-left:calc(var(--spine) + var(--gut))}
+}
+@media (max-width:420px){
+  :root{--spine:36px}
+  .nav{gap:14px; padding:14px 16px}
+  .sec-label{letter-spacing:.2em}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important; transition-duration:.001ms !important}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Sections">
+  <a href="#work">work</a><a href="#sound">sound</a><a href="#worlds">worlds</a><a href="#writing">writing</a><a href="#contact">contact</a>
+</nav>
+
+<div class="sheet">
+  <div class="spine" aria-hidden="true"><div class="spine-inner" id="spine"></div></div>
+  <div class="margin" aria-hidden="true" id="margin"></div>
+
+  <div class="col">
+
+    <header class="hero">
+      <h1 class="display">Max<br>Gupta</h1>
+    </header>
+
+  </div>
+</div>
+
+<!-- obi band: full-bleed, breaks the content edge both ways -->
+<div class="obi">
+  <div class="obi-in">
+    <span class="ckpt"><span class="tag">pretrain</span><span class="arrow">&#9656;</span><b>columbia</b> &middot; <b>princeton</b></span>
+    <span class="ckpt"><span class="tag">finetune</span><span class="arrow">&#9656;</span><b>prior</b></span>
+    <span class="stamp">2026</span>
+  </div>
+</div>
+
+<div class="sheet">
+  <div class="spine" aria-hidden="true"></div>
+  <div class="margin" aria-hidden="true"></div>
+  <div class="col">
+
+    <section id="work">
+      <h2 class="sec-label">work</h2>
+      <div class="work-grid">
+        <div class="idx">
+          <div class="entry">
+            <h3>Convolutional Neural Networks Can (Meta&#8209;)Learn the Same&#8209;Different Relation</h3>
+            <p class="meta">Cognitive Science Society &middot; 2025</p>
+          </div>
+          <div class="entry">
+            <h3>Teasing Apart Architecture and Initial Weights as Sources of Inductive Bias in Neural Networks</h3>
+            <p class="meta">Cognitive Science Society &middot; 2025</p>
+          </div>
+          <div class="entry">
+            <h3>Meta&#8209;Learning Captures Human&#8209;Like Geometric Sensitivity</h3>
+            <p class="meta">Cognitive Science Society &middot; 2026</p>
+          </div>
+          <div class="entry">
+            <h3>Inductive Biases for Relational Reasoning in Neural Networks</h3>
+            <p class="meta">Princeton University &middot; 2026</p>
+          </div>
+          <a class="more" href="https://scholar.google.com/citations?user=8n1BqYUAAAAJ&amp;hl=en">all publications &#8594; google scholar</a>
+        </div>
+        <div class="probe-field">
+          <div class="field" style="height:100%;min-height:420px">probe-tap field &middot; pass 2</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="sound">
+      <h2 class="sec-label">sound</h2>
+    </section>
+  </div>
+</div>
+
+<!-- sound figure bleeds past both content edges -->
+<div class="bleed" style="padding:0 max(2vw,12px)">
+  <div class="field sound-field">chord graph &middot; markov fan &middot; pass 2</div>
+</div>
+
+<div class="sheet">
+  <div class="spine" aria-hidden="true"></div><div class="margin" aria-hidden="true"></div>
+  <div class="col"><div style="height:14vh"></div></div>
+</div>
+
+<div class="cut bleed"><span>worlds</span></div>
+
+<div class="sheet">
+  <div class="spine" aria-hidden="true"></div>
+  <div class="margin" aria-hidden="true"></div>
+  <div class="col">
+
+    <section id="worlds">
+      <div class="plates">
+        <div class="plate p1"><div class="field" style="height:100%">plate 01</div></div>
+        <div class="plate p2"><div class="field" style="height:100%">plate 02</div></div>
+        <div class="plate p3"><div class="field" style="height:100%">plate 03</div></div>
+      </div>
+    </section>
+
+    <section id="writing">
+      <h2 class="sec-label">writing</h2>
+      <div class="page">
+        <div class="post"><h3>&mdash;</h3><span class="mono">pass 2</span></div>
+        <div class="post"><h3>&mdash;</h3><span class="mono">pass 2</span></div>
+        <a class="more" href="https://substack.com/@maxgupta662811">substack &#8594;</a>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2 class="sec-label">contact</h2>
+      <div class="links">
+        <a href="mailto:max@priorcomputers.ai">email</a>
+        <a href="https://github.com/MaxDGU">github</a>
+        <a href="https://scholar.google.com/citations?user=8n1BqYUAAAAJ&amp;hl=en">scholar</a>
+        <a href="https://raw.githubusercontent.com/MaxDGU/MaxDGU.github.io/master/assets/Max%20Gupta%20CV-2026.pdf">cv</a>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<footer class="colophon">
+  <p>Set in Shippori Mincho and Zen Kaku Gothic New, with IBM Plex Mono for anything measured.
+  Drawn as SVG and CSS &mdash; no images, no gradients. Hand-built, no framework. The fan is <i>Metastaseis</i>.</p>
+</footer>
+
+<script>
+// X-sheet rail: a continuous ordinal ruler keyed to scroll position.
+// Frames advance with the document, one tick per 24px, marked every 6 (a beat).
+(function(){
+  var rail=document.getElementById('spine'); if(!rail) return;
+  var STEP=24, N=Math.ceil(window.innerHeight/STEP)+2, nodes=[];
+  for(var i=0;i<N;i++){
+    var d=document.createElement('div');
+    d.className='tick'; d.style.top=(i*STEP)+'px';
+    rail.appendChild(d); nodes.push(d);
+  }
+  function paint(){
+    var base=Math.floor(window.scrollY/STEP);
+    for(var i=0;i<nodes.length;i++){
+      var f=base+i, beat=(f%6===0);
+      nodes[i].className='tick'+(beat?' beat':'');
+      nodes[i].textContent=beat?String(f).padStart(4,'0'):'';
+    }
+  }
+  paint();
+  addEventListener('scroll',function(){requestAnimationFrame(paint)},{passive:true});
+  addEventListener('resize',paint);
+})();
+</script>
+</body>
 </html>
