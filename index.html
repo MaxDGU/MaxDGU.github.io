@@ -17,6 +17,7 @@
   --disp:"Shippori Mincho",Georgia,serif;
   --body:"Zen Kaku Gothic New",system-ui,sans-serif;
   --t-mono:0.6875rem; --t-mono-lg:0.8125rem;   /* 11px hard floor */
+  --hud:#FCEC0C;             /* the continuous system accent */
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
@@ -59,7 +60,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--cyan);outline-offse
 .hero{min-height:56vh;display:flex;flex-direction:column;justify-content:flex-end}
 .hero .display{margin-bottom:5vh}
 
-.obi{position:relative;background:#0A0A06;border-top:1px solid #3A3610;border-bottom:1px solid #3A3610;padding:26px 0;overflow:hidden;--hud:#FCEC0C}
+.obi{position:relative;background:#0A0A06;border-top:1px solid #3A3610;border-bottom:1px solid #3A3610;padding:26px 0;overflow:hidden}
 .obi>.obibg{position:absolute;inset:0;background:url(assets/plates/band-cyber.png) center/cover;opacity:.55}
 .obi>.obiscrim{position:absolute;inset:0;background:#0A0A06;opacity:.52}
 .obi-in{position:relative;z-index:1}
@@ -77,20 +78,9 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--cyan);outline-offse
 
 /* ── themed bands: the game palettes, now carrying whole sections ── */
 .band{position:relative;overflow:hidden}
-.band>.bg{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0}
-.band>.scrim{position:absolute;inset:0;z-index:0}
 .band>.sheet,.band>.bleedwrap{position:relative;z-index:1}
 .band-edge{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 
-.b-cyber>.bg{background-image:url(assets/plates/band-cyber.png);opacity:.55}
-.b-cyber>.scrim{background:#080B12;opacity:.52}
-.b-clair>.bg{background-image:url(assets/plates/band-clair.png);opacity:.34}
-.b-clair>.scrim{background:#0B0814;opacity:.64}
-/* parchment flips the whole token set — a printed page that looks printed */
-.b-parch{--bone:#2A1A0C;--dim:#6B4F35;--faint:#94795A;--line:#C3A87E;--cyan:#8C3A2B;--amber:#8C3A2B}
-.b-parch>.bg{background-image:url(assets/plates/band-parch.png);opacity:1}
-.b-parch>.scrim{background:#EFE6D2;opacity:.30}
-.b-parch .sheet::before{background:var(--line)}
 
 #work{padding-top:16vh;padding-bottom:14vh}
 #sound{padding-top:14vh}
@@ -130,6 +120,26 @@ svg.score{display:block;width:100%;min-width:960px;height:auto}
 .score .ch:focus-visible .hit{stroke:var(--cyan);stroke-width:2}
 .score .ch.lit .blk{fill:#F2D9A8}
 
+
+
+/* ── continuous chrome: one HUD running the whole document, not per-section blocks ── */
+.chrome{position:fixed;inset:0;pointer-events:none;z-index:30}
+.chrome .c{position:absolute;width:22px;height:22px}
+.chrome .c.tl{top:12px;left:12px;border-top:2px solid var(--hud);border-left:2px solid var(--hud)}
+.chrome .c.tr{top:12px;right:12px;border-top:2px solid var(--hud);border-right:2px solid var(--hud)}
+.chrome .c.bl{bottom:12px;left:12px;border-bottom:2px solid var(--hud);border-left:2px solid var(--hud)}
+.chrome .c.br{bottom:12px;right:12px;border-bottom:2px solid var(--hud);border-right:2px solid var(--hud)}
+/* hard 1px rules tiled from an SVG — a repeating band, never a ramp */
+.scan{position:absolute;inset:0;opacity:.055;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='3'%3E%3Crect width='1' height='1' fill='%23FCEC0C'/%3E%3C/svg%3E");
+  background-repeat:repeat}
+/* clear of the ordinal rail on the left and the corner bracket on the right */
+.readout{position:absolute;right:52px;bottom:16px;font-family:var(--mono);font-size:var(--t-mono);
+  letter-spacing:.2em;color:var(--hud);opacity:.6;text-transform:uppercase;text-align:right}
+.readout .dot{display:inline-block;width:5px;height:5px;background:var(--hud);margin-right:9px;vertical-align:middle}
+/* the motif recurs: every section label carries the same reticle */
+.sec-label::before{content:"";display:inline-block;width:9px;height:9px;
+  border-left:2px solid var(--hud);border-top:2px solid var(--hud);margin-right:2px;transform:translateY(-2px)}
 
 /* ── the visualiser: notes + frequency-ratio operators ──────── */
 .viz{position:relative;margin-top:34px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(10,7,20,.5)}
@@ -198,6 +208,7 @@ svg.score{display:block;width:100%;min-width:960px;height:auto}
   <a href="#work">work</a><a href="#sound">sound</a><a href="#reading">reading</a><a href="#writing">writing</a><a href="#contact">contact</a>
 </nav>
 
+<div class="chrome" aria-hidden="true"><div class="scan"></div><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="readout" id="readout"><span class="dot"></span>sec 01 / hero &#183; fr 0000</div></div>
 <div class="rail" aria-hidden="true"><div class="rail-in"><div class="rail-col" id="spine"></div></div></div>
 
 <div class="sheet">
@@ -211,9 +222,8 @@ svg.score{display:block;width:100%;min-width:960px;height:auto}
   <span class="ckpt"><span class="tag">finetune</span><span class="arrow">&#9656;</span><b>prior</b></span>
   <span class="stamp">CKPT 2026</span></div></div>
 
-<div class="band b-cyber band-edge">
-  <div class="bg"></div><div class="scrim"></div>
-  <div class="sheet">
+<div class="band band-edge">
+    <div class="sheet">
     <div class="spine" aria-hidden="true"></div>
     <div class="margin" aria-hidden="true"><div class="cam">sec 02 &#183; work<br>04 entries<br>layers 07<br>taps 03</div></div>
     <div class="col">
@@ -234,9 +244,8 @@ svg.score{display:block;width:100%;min-width:960px;height:auto}
   </div>
 </div>
 
-<div class="band b-clair band-edge">
-  <div class="bg"></div><div class="scrim"></div>
-  <div class="sheet">
+<div class="band band-edge">
+    <div class="sheet">
     <div class="spine" aria-hidden="true"></div>
     <div class="margin" aria-hidden="true"><div class="cam">sec 03 &#183; sound<br>bars 1&ndash;8<br>16 changes</div></div>
     <div class="col">
@@ -246,14 +255,10 @@ svg.score{display:block;width:100%;min-width:960px;height:auto}
             <span class="mono">visualiser</span>
             <button id="vizaudio" class="mute" aria-pressed="false">tones: off</button>
             <button id="vizreset" class="mute">reset</button>
-            <span class="mono key">a note meets an operator &#183; its frequency is multiplied</span>
+            <span class="mono key">notes carry frequency &#183; operators act on it</span>
           </div>
           <canvas id="vizc" aria-label="Notes and frequency-ratio operators colliding; each collision multiplies a note's frequency by the operator's ratio."></canvas>
-          <div class="vizfoot">
-            <span class="mono">&times;2 octave</span><span class="mono">&times;3&#8260;2 fifth</span>
-            <span class="mono">&times;4&#8260;3 fourth</span><span class="mono">&times;5&#8260;4 major third</span>
-            <span class="mono">&divide;2 octave down</span><span class="mono">just intonation</span>
-          </div>
+          <div class="vizfoot"><span class="mono">hover an operator to read it</span></div>
         </div>
         <div class="scorewrap">
           <div class="scorehead"><span class="mono">&#39;round midnight</span>
@@ -288,9 +293,8 @@ svg.score{display:block;width:100%;min-width:960px;height:auto}
   </div>
 </div>
 
-<div class="band b-parch band-edge">
-  <div class="bg"></div><div class="scrim"></div>
-  <div class="sheet">
+<div class="band band-edge">
+    <div class="sheet">
     <div class="spine" aria-hidden="true"></div>
     <div class="margin" aria-hidden="true"><div class="cam">sec 05 &#183; writing<br>02 entries</div></div>
     <div class="col">
@@ -407,6 +411,22 @@ Drawn as SVG and CSS &mdash; no gradients. Hand-built, no framework. The fan is 
     g.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();play();}});
   });
 })();
+
+/* the readout is the chrome's only moving part: section + frame, always on */
+(function(){
+  var out=document.getElementById('readout'); if(!out) return;
+  var secs=[].slice.call(document.querySelectorAll('section'));
+  function upd(){
+    var y=window.scrollY+window.innerHeight*0.34, cur=null, n=1;
+    for(var i=0;i<secs.length;i++){
+      var t=secs[i].getBoundingClientRect().top+window.scrollY;
+      if(t<=y){cur=secs[i];n=i+2}
+    }
+    var id=cur?cur.id:'hero', fr=String(Math.floor(window.scrollY/24)).padStart(4,'0');
+    out.innerHTML='<span class="dot"></span>sec '+String(cur?n:1).padStart(2,'0')+' / '+id+' &#183; fr '+fr;
+  }
+  upd(); addEventListener('scroll',function(){requestAnimationFrame(upd)},{passive:true});
+})();
 </script>
 <script>
 /* ── notes and operators ────────────────────────────────────────
@@ -419,10 +439,15 @@ Drawn as SVG and CSS &mdash; no gradients. Hand-built, no framework. The fan is 
   var ctx=cv.getContext('2d'), W=0,H=0,DPR=1;
   var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   var NAMES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-  var OPS=[{r:2,l:'\u00d72'},{r:0.5,l:'\u00f72'},{r:1.5,l:'\u00d73\u20442'},
-           {r:4/3,l:'\u00d74\u20443'},{r:1.25,l:'\u00d75\u20444'}];
+  var OPS=[
+    {r:2,      l:'\u00d7', t:'double \u2014 up an octave'},
+    {r:0.5,    l:'\u00f7', t:'halve \u2014 down an octave'},
+    {r:1.5,    l:'+',       t:'up a fifth'},
+    {r:0.75,   l:'\u2212', t:'down a fourth'},
+    {r:1.618034,l:'\u03c6',t:'golden ratio \u2014 lands between notes'},
+    {r:Math.pow(2,1/12),l:'\u0394',t:'one semitone'}];
   var LO=110, HI=1320;
-  var notes=[], ops=[], audio=false, actx=null, seedv=20260810;
+  var notes=[], ops=[], audio=false, actx=null, seedv=20260810, hover=null;
   function rnd(){ seedv=(seedv*1103515245+12345)&0x7fffffff; return seedv/0x7fffffff; }
 
   function name(f){
@@ -476,7 +501,7 @@ Drawn as SVG and CSS &mdash; no gradients. Hand-built, no framework. The fan is 
     }
     for(i=0;i<notes.length;i++){ n=notes[i];
       for(var j=0;j<ops.length;j++){ o=ops[j];
-        var dx=n.x-o.x, dy=n.y-o.y, d=Math.hypot(dx,dy), hit=radius(n.f)+24;
+        var dx=n.x-o.x, dy=n.y-o.y, d=Math.hypot(dx,dy), hit=radius(n.f)+19;
         if(d<hit&&d>0){
           n.f=fold(n.f*o.op.r);            // the operation, applied
           var nx=dx/d, ny=dy/d, push=(hit-d)+1;
@@ -492,13 +517,23 @@ Drawn as SVG and CSS &mdash; no gradients. Hand-built, no framework. The fan is 
     ctx.clearRect(0,0,W,H);
     var i,o,n;
     for(i=0;i<ops.length;i++){ o=ops[i];
+      var hov=(hover===o);
       ctx.save();
-      ctx.strokeStyle=o.flash>0?'#7FB6D9':'#5F6879';
-      ctx.lineWidth=1; ctx.beginPath(); ctx.rect(o.x-24,o.y-19,48,38); ctx.stroke();
-      ctx.fillStyle=o.flash>0?'#7FB6D9':'#98A1B2';
-      ctx.font='500 15px "IBM Plex Mono",monospace';
+      ctx.fillStyle=o.flash>0?'#7FB6D9':(hov?'#EDE9DF':'#98A1B2');
+      ctx.font='400 30px "Shippori Mincho",Georgia,serif';
       ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.fillText(o.op.l,o.x,o.y+1);
+      if(hov){
+        ctx.strokeStyle='#FCEC0C'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.arc(o.x,o.y,26,0,6.2832); ctx.stroke();
+        var tip=o.op.t, pad=9;
+        ctx.font='400 12px "IBM Plex Mono",monospace'; ctx.textAlign='left';
+        var w=ctx.measureText(tip).width, tx=Math.min(o.x+34,W-w-pad*2-4), ty=o.y-11;
+        ctx.fillStyle='rgba(8,11,18,.92)'; ctx.fillRect(tx,ty,w+pad*2,24);
+        ctx.strokeStyle='#FCEC0C'; ctx.strokeRect(tx,ty,w+pad*2,24);
+        ctx.fillStyle='#EDE9DF'; ctx.textBaseline='middle';
+        ctx.fillText(tip,tx+pad,ty+13);
+      }
       ctx.restore();
     }
     for(i=0;i<notes.length;i++){ n=notes[i];
@@ -526,6 +561,14 @@ Drawn as SVG and CSS &mdash; no gradients. Hand-built, no framework. The fan is 
   resize(); addEventListener('resize',function(){resize()});
   draw();
   if(!reduce) requestAnimationFrame(loop);
+
+  cv.addEventListener('mousemove',function(e){
+    var r=cv.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top, best=null;
+    for(var i=0;i<ops.length;i++){ if(Math.hypot(ops[i].x-mx,ops[i].y-my)<30){best=ops[i];break} }
+    hover=best; cv.style.cursor=best?'pointer':'default';
+    if(reduce) draw();
+  });
+  cv.addEventListener('mouseleave',function(){hover=null;if(reduce)draw();});
 
   var ab=document.getElementById('vizaudio');
   ab.addEventListener('click',function(){
