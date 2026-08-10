@@ -21,7 +21,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
-body{background:var(--void);color:var(--bone);font-family:var(--body);line-height:1.55;overflow-x:hidden;font-synthesis-weight:none}
+body{background:var(--void) url(assets/plates/bg-city.png) top center/100% auto repeat-y;color:var(--bone);font-family:var(--body);line-height:1.55;overflow-x:hidden;font-synthesis-weight:none}
 
 .sheet{display:grid;grid-template-columns:var(--spine) minmax(0,1fr) var(--margin);max-width:1400px;margin:0 auto;position:relative}
 .sheet::before{content:"";position:absolute;top:0;bottom:0;left:var(--spine);width:1px;background:var(--line);z-index:2}
@@ -46,7 +46,7 @@ body{background:var(--void);color:var(--bone);font-family:var(--body);line-heigh
 
 .cam{position:sticky;top:96px;padding:6px 0 6px 18px;line-height:2.05;font-family:var(--mono);font-size:var(--t-mono);color:var(--faint);letter-spacing:.08em;text-transform:uppercase;border-left:1px solid var(--line)}
 
-.display{font-family:var(--disp);font-weight:800;font-size:clamp(3.25rem,11vw,8.5rem);line-height:.9;letter-spacing:-.02em}
+.display{font-family:var(--disp);font-weight:800;font-size:clamp(2.4rem,6.4vw,5rem);line-height:.94;letter-spacing:-.015em}
 .sec-label{font-family:var(--mono);font-size:var(--t-mono-lg);letter-spacing:.34em;text-transform:lowercase;color:var(--dim);display:flex;align-items:baseline;gap:18px}
 .sec-label::after{content:"";flex:1;height:1px;background:var(--line)}
 .mono{font-family:var(--mono);font-size:var(--t-mono);color:var(--faint);letter-spacing:.08em}
@@ -57,24 +57,9 @@ a{color:var(--bone);text-decoration:none}
 a:hover,.nav a:hover{color:var(--cyan)}
 a:focus-visible,button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 
-.hero{min-height:56vh;display:flex;flex-direction:column;justify-content:flex-end}
+.hero{min-height:44vh;display:flex;flex-direction:column;justify-content:flex-end}
 .hero .display{margin-bottom:5vh}
 
-.obi{position:relative;background:#0A0A06;border-top:1px solid #3A3610;border-bottom:1px solid #3A3610;padding:26px 0;overflow:hidden}
-.obi>.obibg{position:absolute;inset:0;background:url(assets/plates/band-cyber.png) center/cover;opacity:.55}
-.obi>.obiscrim{position:absolute;inset:0;background:#0A0A06;opacity:.52}
-.obi-in{position:relative;z-index:1}
-.obi .brk{position:absolute;width:18px;height:18px;z-index:1}
-.obi .brk.a{top:9px;left:14px;border-top:2px solid var(--hud);border-left:2px solid var(--hud)}
-.obi .brk.b{top:9px;right:14px;border-top:2px solid var(--hud);border-right:2px solid var(--hud)}
-.obi .brk.c{bottom:9px;left:14px;border-bottom:2px solid var(--hud);border-left:2px solid var(--hud)}
-.obi .brk.d{bottom:9px;right:14px;border-bottom:2px solid var(--hud);border-right:2px solid var(--hud)}
-.obi-in{max-width:1400px;margin:0 auto;padding-left:calc(var(--spine) + var(--gut));padding-right:var(--gut);display:flex;flex-wrap:wrap;gap:10px 44px;align-items:baseline}
-.ckpt{font-family:"Rajdhani",var(--mono);font-weight:600;font-size:1.05rem;color:#C9BB6A;letter-spacing:.08em}
-.ckpt b{color:var(--hud);font-weight:700}
-.ckpt .arrow{color:var(--hud);padding:0 9px}
-.ckpt .tag{color:#7A7333;text-transform:uppercase}
-.obi-in .stamp{margin-left:auto;color:var(--hud);font-family:var(--mono);font-size:var(--t-mono);letter-spacing:.2em}
 
 /* ── themed bands: the game palettes, now carrying whole sections ── */
 .band{position:relative;overflow:hidden}
@@ -103,22 +88,8 @@ svg.probe{display:block;width:100%;max-width:300px;height:auto}
 .probe .pcode{font-family:var(--mono);font-size:11px;fill:var(--faint)}
 
 /* sound */
-.scorewrap{margin-top:36px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(10,7,20,.55);padding:18px 0 6px;overflow-x:auto}
-.scorehead{display:flex;align-items:baseline;gap:22px;padding:0 20px 12px}
-.scorehead .more{margin-top:0}
 .mute{font-family:var(--mono);font-size:var(--t-mono);letter-spacing:.12em;background:transparent;border:1px solid var(--line);color:var(--dim);padding:5px 11px;cursor:pointer;text-transform:uppercase}
 .mute[aria-pressed="true"]{border-color:var(--amber);color:var(--amber)}
-svg.score{display:block;width:100%;min-width:960px;height:auto}
-.score .ax{font-family:var(--mono);font-size:11px;fill:var(--dim)}
-.score .hz,.score .unit,.score .bar{font-family:var(--mono);font-size:11px;fill:var(--faint)}
-.score .sym{font-family:var(--mono);font-size:11px;fill:var(--amber);letter-spacing:.04em}
-.score .meta{font-family:var(--mono);font-size:11px;fill:var(--faint);letter-spacing:.1em}
-.score .ch{cursor:pointer}
-.score .ch .blk{transition:fill .12s}
-.score .ch:hover .blk,.score .ch:focus-visible .blk{fill:var(--bone)}
-.score .ch:focus-visible{outline:none}
-.score .ch:focus-visible .hit{stroke:var(--cyan);stroke-width:2}
-.score .ch.lit .blk{fill:#F2D9A8}
 
 
 
@@ -130,7 +101,7 @@ svg.score{display:block;width:100%;min-width:960px;height:auto}
 .chrome .c.bl{bottom:12px;left:12px;border-bottom:2px solid var(--hud);border-left:2px solid var(--hud)}
 .chrome .c.br{bottom:12px;right:12px;border-bottom:2px solid var(--hud);border-right:2px solid var(--hud)}
 /* hard 1px rules tiled from an SVG — a repeating band, never a ramp */
-.scan{position:absolute;inset:0;opacity:.055;
+.scan{position:absolute;inset:0;opacity:.05;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='3'%3E%3Crect width='1' height='1' fill='%23FCEC0C'/%3E%3C/svg%3E");
   background-repeat:repeat}
 /* clear of the ordinal rail on the left and the corner bracket on the right */
@@ -186,6 +157,10 @@ svg.score{display:block;width:100%;min-width:960px;height:auto}
 .vizbar{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:baseline;padding:12px 20px;border-bottom:1px solid var(--line)}
 .vizbar .key{margin-left:auto;color:var(--faint)}
 .vizfoot{display:flex;flex-wrap:wrap;gap:8px 22px;padding:10px 20px;border-top:1px solid var(--line)}
+
+
+.seq{position:relative;margin-top:34px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(6,8,14,.62)}
+.seq canvas{display:block;width:100%;height:clamp(300px,50vh,430px);touch-action:none}
 
 /* the hard cut — now introducing reading */
 .cut{height:56vh;background:#000;display:flex;align-items:center;justify-content:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);position:relative}
@@ -256,10 +231,6 @@ svg.score{display:block;width:100%;min-width:960px;height:auto}
 </div>
 
 
-<div class="obi"><div class="obibg"></div><div class="obiscrim"></div><span class="brk a"></span><span class="brk b"></span><span class="brk c"></span><span class="brk d"></span><div class="obi-in">
-  <span class="ckpt"><span class="tag">pretrain</span><span class="arrow">&#9656;</span><b>columbia</b> &middot; <b>princeton</b></span>
-  <span class="ckpt"><span class="tag">finetune</span><span class="arrow">&#9656;</span><b>prior</b></span>
-  <span class="stamp">CKPT 2026</span></div></div>
 
 <div class="band band-edge">
     <div class="sheet">
@@ -286,9 +257,24 @@ svg.score{display:block;width:100%;min-width:960px;height:auto}
 <div class="band band-edge">
     <div class="sheet">
     <div class="spine" aria-hidden="true"></div>
-    <div class="margin" aria-hidden="true"><div class="cam">sec 03 &#183; sound<br>bars 1&ndash;8<br>16 changes</div></div>
+    <div class="margin" aria-hidden="true"><div class="cam">sec 03 &#183; sound<br>markov chain<br>2808 tunes<br>16 tokens<br>order 1</div></div>
     <div class="col">
       <section id="sound"><h2 class="sec-label">sound</h2>
+        <div class="seq">
+          <div class="vizbar">
+            <span class="mono">markov sequencer</span>
+            <button id="seqaudio" class="mute" aria-pressed="false">chords: off</button>
+            <button id="seqplay" class="mute" aria-pressed="true">running</button>
+            <span class="mono key" id="seqkey">key of C &#183; click a row to transpose</span>
+          </div>
+          <canvas id="seqc" aria-label="A live Markov chord sequencer trained on 2808 jazz standards; chords scroll left and sound as they cross the playhead."></canvas>
+          <div class="vizfoot">
+            <span class="mono" id="seqnow">&mdash;</span>
+            <span class="mono">2808 standards &#183; 156,897 transitions</span>
+            <span class="mono">click a chord to steer the chain</span>
+          </div>
+        </div>
+        
         <div class="viz">
           <div class="vizbar">
             <span class="mono">visualiser</span>
@@ -299,13 +285,7 @@ svg.score{display:block;width:100%;min-width:960px;height:auto}
           <canvas id="vizc" aria-label="Notes and frequency-ratio operators colliding; each collision multiplies a note's frequency by the operator's ratio."></canvas>
           <div class="vizfoot"><span class="mono">hover an operator to read it</span></div>
         </div>
-        <div class="scorewrap">
-          <div class="scorehead"><span class="mono">&#39;round midnight</span>
-            <button id="mute" class="mute" aria-pressed="false">chords: off</button>
-            <a class="more" href="https://soundcloud.com/max-gupta-777538832">soundcloud &#8594;</a></div>
-          <svg class="score" viewBox="0 0 960 470" role="img" aria-label="Round Midnight, bars 1 to 8, chord changes plotted on a pitch field"><title>&#39;Round Midnight &mdash; bars 1&ndash;8, chord roots on a chromatic field</title><path class="fan" d="M40 214 L150 368 L920 368" fill="none" stroke="#2B3549" stroke-width="1" data-i="11"/><path class="fan" d="M40 214 L150 340 L920 340" fill="none" stroke="#2B3549" stroke-width="1" data-i="10"/><path class="fan" d="M40 214 L150 312 L920 312" fill="none" stroke="#2B3549" stroke-width="1" data-i="9"/><path class="fan" d="M40 214 L150 284 L920 284" fill="none" stroke="#2B3549" stroke-width="1" data-i="8"/><path class="fan" d="M40 214 L150 256 L920 256" fill="none" stroke="#2B3549" stroke-width="1" data-i="7"/><path class="fan" d="M40 214 L150 228 L920 228" fill="none" stroke="#2B3549" stroke-width="1" data-i="6"/><path class="fan" d="M40 214 L150 200 L920 200" fill="none" stroke="#2B3549" stroke-width="1" data-i="5"/><path class="fan" d="M40 214 L150 172 L920 172" fill="none" stroke="#2B3549" stroke-width="1" data-i="4"/><path class="fan" d="M40 214 L150 144 L920 144" fill="none" stroke="#2B3549" stroke-width="1" data-i="3"/><path class="fan" d="M40 214 L150 116 L920 116" fill="none" stroke="#2B3549" stroke-width="1" data-i="2"/><path class="fan" d="M40 214 L150 88 L920 88" fill="none" stroke="#2B3549" stroke-width="1" data-i="1"/><path class="fan" d="M40 214 L150 60 L920 60" fill="none" stroke="#2B3549" stroke-width="1" data-i="0"/><text class="ax" x="136" y="372" text-anchor="end">C</text><text class="hz" x="104" y="372" text-anchor="end">130.81</text><text class="ax" x="136" y="344" text-anchor="end">Db</text><text class="hz" x="104" y="344" text-anchor="end">138.59</text><text class="ax" x="136" y="316" text-anchor="end">D</text><text class="hz" x="104" y="316" text-anchor="end">146.83</text><text class="ax" x="136" y="288" text-anchor="end">Eb</text><text class="hz" x="104" y="288" text-anchor="end">155.56</text><text class="ax" x="136" y="260" text-anchor="end">E</text><text class="hz" x="104" y="260" text-anchor="end">164.81</text><text class="ax" x="136" y="232" text-anchor="end">F</text><text class="hz" x="104" y="232" text-anchor="end">174.61</text><text class="ax" x="136" y="204" text-anchor="end">Gb</text><text class="hz" x="104" y="204" text-anchor="end">185.00</text><text class="ax" x="136" y="176" text-anchor="end">G</text><text class="hz" x="104" y="176" text-anchor="end">196.00</text><text class="ax" x="136" y="148" text-anchor="end">Ab</text><text class="hz" x="104" y="148" text-anchor="end">207.65</text><text class="ax" x="136" y="120" text-anchor="end">A</text><text class="hz" x="104" y="120" text-anchor="end">220.00</text><text class="ax" x="136" y="92" text-anchor="end">Bb</text><text class="hz" x="104" y="92" text-anchor="end">233.08</text><text class="ax" x="136" y="64" text-anchor="end">B</text><text class="hz" x="104" y="64" text-anchor="end">246.94</text><text class="unit" x="104" y="394" text-anchor="end">Hz</text><line x1="190.0" y1="46" x2="190.0" y2="384" stroke="#2B3549" stroke-width="1" stroke-dasharray="2 6"/><text class="bar" x="195.0" y="402">1</text><line x1="281.3" y1="46" x2="281.3" y2="384" stroke="#2B3549" stroke-width="1" stroke-dasharray="2 6"/><text class="bar" x="286.3" y="402">2</text><line x1="372.5" y1="46" x2="372.5" y2="384" stroke="#2B3549" stroke-width="1" stroke-dasharray="2 6"/><text class="bar" x="377.5" y="402">3</text><line x1="463.8" y1="46" x2="463.8" y2="384" stroke="#2B3549" stroke-width="1" stroke-dasharray="2 6"/><text class="bar" x="468.8" y="402">4</text><line x1="555.0" y1="46" x2="555.0" y2="384" stroke="#2B3549" stroke-width="1" stroke-dasharray="2 6"/><text class="bar" x="560.0" y="402">5</text><line x1="646.3" y1="46" x2="646.3" y2="384" stroke="#2B3549" stroke-width="1" stroke-dasharray="2 6"/><text class="bar" x="651.3" y="402">6</text><line x1="737.5" y1="46" x2="737.5" y2="384" stroke="#2B3549" stroke-width="1" stroke-dasharray="2 6"/><text class="bar" x="742.5" y="402">7</text><line x1="828.8" y1="46" x2="828.8" y2="384" stroke="#2B3549" stroke-width="1" stroke-dasharray="2 6"/><text class="bar" x="833.8" y="402">8</text><line x1="920.0" y1="46" x2="920.0" y2="384" stroke="#2B3549" stroke-width="1" stroke-dasharray="2 6"/><g class="ch" data-i="0" data-f="155.6,185.0,233.1,261.6" tabindex="0" role="button" aria-label="Ebm6, bar 1:1"><rect class="hit" x="190.0" y="271" width="45.6" height="26" fill="transparent"/><rect class="blk" x="190.0" y="276" width="45.6" height="16" fill="#D9A05B"/><text class="sym" x="190.0" y="32">Ebm6</text><line class="tie" x1="190.0" y1="37" x2="190.0" y2="274" stroke="#D9A05B" stroke-width="1" opacity=".28"/></g><g class="ch" data-i="1" data-f="130.8,155.6,185.0,233.1" tabindex="0" role="button" aria-label="Cm7b5, bar 1:3"><rect class="hit" x="235.6" y="355" width="45.6" height="26" fill="transparent"/><rect class="blk" x="235.6" y="360" width="45.6" height="16" fill="#D9A05B"/><text class="sym" x="235.6" y="46">Cm7b5</text><line class="tie" x1="235.6" y1="51" x2="235.6" y2="358" stroke="#D9A05B" stroke-width="1" opacity=".28"/></g><g class="ch" data-i="2" data-f="174.6,207.7,246.9,311.1" tabindex="0" role="button" aria-label="Fm7b5, bar 2:1"><rect class="hit" x="281.2" y="215" width="45.6" height="26" fill="transparent"/><rect class="blk" x="281.2" y="220" width="45.6" height="16" fill="#D9A05B"/><text class="sym" x="281.2" y="32">Fm7b5</text><line class="tie" x1="281.2" y1="37" x2="281.2" y2="218" stroke="#D9A05B" stroke-width="1" opacity=".28"/></g><g class="ch" data-i="3" data-f="233.1,293.7,370.0,415.3,554.4" tabindex="0" role="button" aria-label="Bb7#5#9, bar 2:3"><rect class="hit" x="326.9" y="75" width="45.6" height="26" fill="transparent"/><rect class="blk" x="326.9" y="80" width="45.6" height="16" fill="#D9A05B"/><text class="sym" x="326.9" y="46">Bb7#5#9</text><line class="tie" x1="326.9" y1="51" x2="326.9" y2="78" stroke="#D9A05B" stroke-width="1" opacity=".28"/></g><g class="ch" data-i="4" data-f="155.6,185.0,233.1,277.2" tabindex="0" role="button" aria-label="Ebm7, bar 3:1"><rect class="hit" x="372.5" y="271" width="45.6" height="26" fill="transparent"/><rect class="blk" x="372.5" y="276" width="45.6" height="16" fill="#D9A05B"/><text class="sym" x="372.5" y="32">Ebm7</text><line class="tie" x1="372.5" y1="37" x2="372.5" y2="274" stroke="#D9A05B" stroke-width="1" opacity=".28"/></g><g class="ch" data-i="5" data-f="207.7,261.6,311.1,370.0,466.2" tabindex="0" role="button" aria-label="Ab9, bar 3:3"><rect class="hit" x="418.1" y="131" width="45.6" height="26" fill="transparent"/><rect class="blk" x="418.1" y="136" width="45.6" height="16" fill="#D9A05B"/><text class="sym" x="418.1" y="46">Ab9</text><line class="tie" x1="418.1" y1="51" x2="418.1" y2="134" stroke="#D9A05B" stroke-width="1" opacity=".28"/></g><g class="ch" data-i="6" data-f="246.9,293.7,370.0,440.0" tabindex="0" role="button" aria-label="Bm7, bar 4:1"><rect class="hit" x="463.8" y="47" width="22.8" height="26" fill="transparent"/><rect class="blk" x="463.8" y="52" width="22.8" height="16" fill="#D9A05B"/><text class="sym" x="463.8" y="32">Bm7</text><line class="tie" x1="463.8" y1="37" x2="463.8" y2="50" stroke="#D9A05B" stroke-width="1" opacity=".28"/></g><g class="ch" data-i="7" data-f="164.8,207.7,246.9,293.7,370.0" tabindex="0" role="button" aria-label="E9, bar 4:2"><rect class="hit" x="486.6" y="243" width="22.8" height="26" fill="transparent"/><rect class="blk" x="486.6" y="248" width="22.8" height="16" fill="#D9A05B"/><text class="sym" x="486.6" y="46">E9</text><line class="tie" x1="486.6" y1="51" x2="486.6" y2="246" stroke="#D9A05B" stroke-width="1" opacity=".28"/></g><g class="ch" data-i="8" data-f="233.1,277.2,349.2,415.3" tabindex="0" role="button" aria-label="Bbm7, bar 4:3"><rect class="hit" x="509.4" y="75" width="22.8" height="26" fill="transparent"/><rect class="blk" x="509.4" y="80" width="22.8" height="16" fill="#D9A05B"/><text class="sym" x="509.4" y="32">Bbm7</text><line class="tie" x1="509.4" y1="37" x2="509.4" y2="78" stroke="#D9A05B" stroke-width="1" opacity=".28"/></g><g class="ch" data-i="9" data-f="155.6,196.0,233.1,277.2" tabindex="0" role="button" aria-label="Eb7, bar 4:4"><rect class="hit" x="532.2" y="271" width="22.8" height="26" fill="transparent"/><rect class="blk" x="532.2" y="276" width="22.8" height="16" fill="#D9A05B"/><text class="sym" x="532.2" y="46">Eb7</text><line class="tie" x1="532.2" y1="51" x2="532.2" y2="274" stroke="#D9A05B" stroke-width="1" opacity=".28"/></g><g class="ch" data-i="10" data-f="207.7,246.9,311.1,370.0" tabindex="0" role="button" aria-label="Abm7, bar 5:1"><rect class="hit" x="555.0" y="131" width="45.6" height="26" fill="transparent"/><rect class="blk" x="555.0" y="136" width="45.6" height="16" fill="#D9A05B"/><text class="sym" x="555.0" y="32">Abm7</text><line class="tie" x1="555.0" y1="37" x2="555.0" y2="134" stroke="#D9A05B" stroke-width="1" opacity=".28"/></g><g class="ch" data-i="11" data-f="138.6,174.6,207.7,246.9,311.1" tabindex="0" role="button" aria-label="Db9, bar 5:3"><rect class="hit" x="600.6" y="327" width="45.6" height="26" fill="transparent"/><rect class="blk" x="600.6" y="332" width="45.6" height="16" fill="#D9A05B"/><text class="sym" x="600.6" y="46">Db9</text><line class="tie" x1="600.6" y1="51" x2="600.6" y2="330" stroke="#D9A05B" stroke-width="1" opacity=".28"/></g><g class="ch" data-i="12" data-f="155.6,185.0,233.1,277.2" tabindex="0" role="button" aria-label="Ebm7, bar 6:1"><rect class="hit" x="646.3" y="271" width="45.6" height="26" fill="transparent"/><rect class="blk" x="646.3" y="276" width="45.6" height="16" fill="#D9A05B"/><text class="sym" x="646.3" y="32">Ebm7</text><line class="tie" x1="646.3" y1="37" x2="646.3" y2="274" stroke="#D9A05B" stroke-width="1" opacity=".28"/></g><g class="ch" data-i="13" data-f="207.7,261.6,311.1,370.0,466.2" tabindex="0" role="button" aria-label="Ab9, bar 6:3"><rect class="hit" x="691.9" y="131" width="45.6" height="26" fill="transparent"/><rect class="blk" x="691.9" y="136" width="45.6" height="16" fill="#D9A05B"/><text class="sym" x="691.9" y="46">Ab9</text><line class="tie" x1="691.9" y1="51" x2="691.9" y2="134" stroke="#D9A05B" stroke-width="1" opacity=".28"/></g><g class="ch" data-i="14" data-f="246.9,311.1,370.0,440.0,554.4" tabindex="0" role="button" aria-label="B9, bar 7:1"><rect class="hit" x="737.5" y="47" width="91.2" height="26" fill="transparent"/><rect class="blk" x="737.5" y="52" width="91.2" height="16" fill="#D9A05B"/><text class="sym" x="737.5" y="32">B9</text><line class="tie" x1="737.5" y1="37" x2="737.5" y2="50" stroke="#D9A05B" stroke-width="1" opacity=".28"/></g><g class="ch" data-i="15" data-f="233.1,293.7,349.2,415.3,493.9" tabindex="0" role="button" aria-label="Bb7b9, bar 8:1"><rect class="hit" x="828.8" y="75" width="91.2" height="26" fill="transparent"/><rect class="blk" x="828.8" y="80" width="91.2" height="16" fill="#D9A05B"/><text class="sym" x="828.8" y="46">Bb7b9</text><line class="tie" x1="828.8" y1="51" x2="828.8" y2="78" stroke="#D9A05B" stroke-width="1" opacity=".28"/></g><line id="ph" x1="190" y1="46" x2="190" y2="384" stroke="#D8452F" stroke-width="1.5" opacity="0"/><text class="meta" x="190" y="428">MLSP19 / jazz_xlab &#183; 2846 standards &#183; bars 1&ndash;8</text><text class="meta r" x="920" y="428" text-anchor="end">&#39;ROUND MIDNIGHT &#183; MONK &#183; key Ebm</text><text class="meta" x="40" y="240" text-anchor="middle">unison</text></svg>
-        </div>
-      </section>
+        </section>
       <div style="height:12vh"></div>
     </div>
   </div>
@@ -320,14 +300,14 @@ svg.score{display:block;width:100%;min-width:960px;height:auto}
 
 <div class="sheet">
   <div class="spine" aria-hidden="true"></div>
-  <div class="margin" aria-hidden="true"><div class="cam">sec 04 &#183; reading<br>03 entries</div></div>
+  <div class="margin" aria-hidden="true"><div class="cam">sec 04 &#183; reading<br>04 entries</div></div>
   <div class="col">
     <section id="reading">
       <h2 class="sec-label">reading</h2>
       <!-- To add an entry, replace a blank row with:
            <div class="cat-row"><span class="n">01</span><span class="who">Author Name</span><span class="note">note</span></div>
            Drop the class "blank" so the rule under the name disappears. -->
-      <div class="cat"><div class="cat-row"><span class="n">01</span><span class="who">Paul Auster</span><span class="note">fiction</span></div><div class="cat-row"><span class="n">02</span><span class="who">Karl Ove Knausg&aring;rd</span><span class="note">fiction</span></div><div class="cat-row"><span class="n">03</span><span class="who">Rumi</span><span class="note">poetry</span></div><div class="cat-row blank"><span class="n">04</span><span class="who"></span><span class="note"></span></div><div class="cat-row blank"><span class="n">05</span><span class="who"></span><span class="note"></span></div><div class="cat-row blank"><span class="n">06</span><span class="who"></span><span class="note"></span></div><div class="cat-row blank"><span class="n">07</span><span class="who"></span><span class="note"></span></div><div class="cat-row blank"><span class="n">08</span><span class="who"></span><span class="note"></span></div><div class="cat-row blank"><span class="n">09</span><span class="who"></span><span class="note"></span></div><div class="cat-row blank"><span class="n">10</span><span class="who"></span><span class="note"></span></div></div>
+      <div class="cat"><div class="cat-row"><span class="n">01</span><span class="who">Paul Auster</span><span class="note">fiction</span></div><div class="cat-row"><span class="n">02</span><span class="who">Karl Ove Knausg&aring;rd</span><span class="note">fiction</span></div><div class="cat-row"><span class="n">03</span><span class="who">Rumi</span><span class="note">poetry</span></div><div class="cat-row"><span class="n">04</span><span class="who">Ellen Ullman</span><span class="note">essays</span></div><div class="cat-row blank"><span class="n">05</span><span class="who"></span><span class="note"></span></div><div class="cat-row blank"><span class="n">06</span><span class="who"></span><span class="note"></span></div><div class="cat-row blank"><span class="n">07</span><span class="who"></span><span class="note"></span></div><div class="cat-row blank"><span class="n">08</span><span class="who"></span><span class="note"></span></div><div class="cat-row blank"><span class="n">09</span><span class="who"></span><span class="note"></span></div><div class="cat-row blank"><span class="n">10</span><span class="who"></span><span class="note"></span></div></div>
     </section>
   </div>
 </div>
@@ -392,64 +372,8 @@ Drawn as SVG and CSS &mdash; no gradients. Hand-built, no framework. The fan is 
 
 /* the one orchestrated moment: the Metastaseis fan opens from unison, each line
    delayed by its angular divergence; chords enter in time order; playhead sweeps once. */
-(function(){
-  var score=document.querySelector('svg.score'); if(!score) return;
-  var fans=[].slice.call(score.querySelectorAll('.fan')),
-      chs=[].slice.call(score.querySelectorAll('.ch')),
-      ph=score.querySelector('#ph'),
-      reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(reduce){chs.forEach(function(c){c.style.opacity=1});if(ph)ph.style.opacity=0;return;}
-  fans.forEach(function(p){var L=p.getTotalLength();p.style.strokeDasharray=L;p.style.strokeDashoffset=L;});
-  chs.forEach(function(c){c.style.opacity=0});
-  var fired=false;
-  function run(){
-    if(fired)return; fired=true;
-    fans.forEach(function(p){
-      var d=Math.abs(+p.dataset.i-5.5)/5.5;
-      p.style.transition='stroke-dashoffset 900ms cubic-bezier(.22,.61,.36,1) '+(90+d*220)+'ms';
-      p.style.strokeDashoffset=0;
-    });
-    chs.forEach(function(c,i){c.style.transition='opacity 260ms ease '+(900+i*52)+'ms';c.style.opacity=1;});
-    if(!ph)return;
-    var t0=null,START=1180,DUR=1500; ph.style.opacity=1;
-    requestAnimationFrame(function step(t){
-      if(t0===null)t0=t;
-      var e=t-t0; if(e<START){requestAnimationFrame(step);return}
-      var k=Math.min((e-START)/DUR,1);
-      ph.setAttribute('x1',190+k*730); ph.setAttribute('x2',190+k*730);
-      if(k<1)requestAnimationFrame(step); else ph.style.opacity=0;
-    });
-  }
-  new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting)run();})},{threshold:.22}).observe(score);
-})();
 
-/* click a chord, hear it. explicit toggle, never autoplay. */
-(function(){
-  var btn=document.getElementById('mute'); if(!btn) return;
-  var on=false,ctx=null;
-  btn.addEventListener('click',function(){
-    on=!on; btn.setAttribute('aria-pressed',String(on));
-    btn.textContent='chords: '+(on?'on':'off');
-    if(on&&!ctx)ctx=new (window.AudioContext||window.webkitAudioContext)();
-  });
-  document.querySelectorAll('svg.score .ch').forEach(function(g){
-    function play(){
-      g.classList.add('lit'); setTimeout(function(){g.classList.remove('lit')},420);
-      if(!on||!ctx)return;
-      var t=ctx.currentTime;
-      g.dataset.f.split(',').forEach(function(f,i){
-        var o=ctx.createOscillator(),a=ctx.createGain();
-        o.type='sine'; o.frequency.value=parseFloat(f);
-        a.gain.setValueAtTime(0,t);
-        a.gain.linearRampToValueAtTime(.16/(i+1.4),t+.02);
-        a.gain.exponentialRampToValueAtTime(.0001,t+1.5);
-        o.connect(a).connect(ctx.destination); o.start(t); o.stop(t+1.55);
-      });
-    }
-    g.addEventListener('click',play);
-    g.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();play();}});
-  });
-})();
+
 
 /* ── one tracking system ─────────────────────────────────────────
    Section acquisition (brackets lock + readout scrambles), a pointer lane
@@ -696,6 +620,160 @@ Drawn as SVG and CSS &mdash; no gradients. Hand-built, no framework. The fan is 
   document.getElementById('vizreset').addEventListener('click',function(){
     seedv=20260810; build(); draw();
   });
+})();
+</script>
+
+<script>
+/* ── live Markov sequencer ───────────────────────────────────────
+   Transition matrix estimated from 2,808 standards in MLSP19/jazz_xlab,
+   transposed to a common tonic so degrees are key-independent. Rows are
+   permille. The chain walks forever; chords scroll left and sound at the
+   playhead. Clicking a chord re-seeds the chain from that token. */
+(function(){
+  var cv=document.getElementById('seqc'); if(!cv) return;
+  var ctx=cv.getContext('2d'), W=0,H=0,DPR=1;
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var TOK=[[0, "maj", "I"], [7, "dom7", "V"], [2, "min7", "II"], [5, "maj", "IV"], [0, "dom7", "I"], [9, "dom7", "VI"], [2, "dom7", "II"], [7, "maj", "V"], [0, "maj7", "I"], [9, "min", "VI"], [9, "min7", "VI"], [2, "min", "II"], [4, "min7", "III"], [4, "dom7", "III"], [5, "dom7", "IV"], [10, "dom7", "bVII"]], M=[[0, 186, 95, 155, 103, 64, 36, 61, 35, 60, 63, 43, 15, 34, 38, 12], [621, 0, 73, 15, 43, 4, 9, 25, 126, 7, 5, 15, 30, 9, 13, 3], [51, 717, 0, 11, 3, 10, 7, 80, 26, 2, 6, 6, 60, 9, 2, 10], [436, 130, 37, 0, 50, 30, 34, 86, 14, 13, 10, 39, 24, 24, 35, 34], [59, 49, 24, 566, 0, 29, 8, 10, 4, 8, 7, 5, 9, 6, 188, 28], [5, 8, 448, 12, 1, 0, 312, 10, 1, 3, 15, 161, 11, 6, 3, 6], [33, 517, 172, 21, 3, 6, 0, 153, 5, 9, 38, 25, 5, 3, 7, 4], [475, 90, 22, 79, 23, 10, 45, 0, 111, 50, 23, 16, 35, 10, 8, 4], [194, 43, 197, 28, 63, 89, 18, 10, 0, 19, 174, 18, 43, 21, 57, 26], [83, 34, 119, 121, 40, 26, 149, 70, 3, 0, 87, 119, 35, 90, 20, 4], [15, 18, 420, 20, 7, 16, 367, 16, 5, 15, 0, 48, 19, 11, 16, 6], [129, 403, 80, 64, 1, 39, 20, 143, 4, 43, 5, 0, 18, 35, 2, 15], [18, 15, 143, 56, 9, 485, 10, 8, 17, 48, 152, 11, 0, 7, 13, 7], [9, 8, 8, 56, 5, 191, 7, 7, 2, 401, 263, 9, 16, 0, 13, 6], [310, 41, 24, 22, 176, 3, 17, 7, 34, 16, 0, 7, 121, 136, 0, 85], [182, 38, 30, 19, 52, 304, 15, 5, 150, 26, 44, 11, 114, 3, 9, 0]];
+  var IVL={maj:[0,4,7],maj7:[0,4,7,11],min:[0,3,7],min7:[0,3,7,10],min6:[0,3,7,9],
+           dom7:[0,4,7,10],hdim:[0,3,6,10],dim:[0,3,6,9],sus:[0,5,7]};
+  var NM=['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+  var HZ=[130.81,138.59,146.83,155.56,164.81,174.61,185.00,196.00,207.65,220.00,233.08,246.94];
+  var key=0, cur=0, audio=false, actx=null, running=true, hover=null;
+  var CW=132, PH=0.30;                       // chord width px, playhead at 30% of width
+  var chords=[], seed=7;
+  function rnd(){seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff}
+
+  function next(i){
+    var row=M[i], t=0, r=rnd()*1000;
+    for(var j=0;j<row.length;j++){ t+=row[j]; if(r<=t) return {j:j,p:row[j]/10}; }
+    return {j:(i+1)%row.length,p:0};
+  }
+  function push(){
+    var last=chords.length?chords[chords.length-1]:null;
+    var x=last?last.x+CW:W;
+    var nx=next(cur); cur=nx.j;
+    chords.push({x:x,tok:cur,p:nx.p,flash:0,done:false});
+  }
+  function label(t){ return NM[(TOK[t][0]+key)%12]+({maj:'',maj7:'maj7',min:'m',min7:'m7',min6:'m6',dom7:'7',hdim:'m7b5',dim:'dim',sus:'sus'})[TOK[t][1]]; }
+  function degree(t){ return TOK[t][2]+TOK[t][1]; }
+
+  function resize(){
+    DPR=Math.min(window.devicePixelRatio||1,2);
+    var r=cv.getBoundingClientRect(); W=r.width; H=r.height;
+    cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
+    if(!chords.length){ chords.push({x:W*PH,tok:0,p:0,flash:0,done:true}); while(chords[chords.length-1].x<W+CW) push(); }
+  }
+  var TOP=54, BOT=40;
+  function bandY(pc){ var h=(H-TOP-BOT)/12; return TOP+(11-pc)*h+h/2; }
+  function bandH(){ return (H-TOP-BOT)/12; }
+
+  function sound(t){
+    if(!audio||!actx) return;
+    var root=(TOK[t][0]+key)%12, ivs=IVL[TOK[t][1]]||[0,4,7], now=actx.currentTime;
+    ivs.forEach(function(iv,k){
+      var pc=(root+iv)%12, oct=Math.floor((root+iv)/12);
+      var f=HZ[pc]*Math.pow(2,oct);
+      var o=actx.createOscillator(), a=actx.createGain();
+      o.type='triangle'; o.frequency.value=f;
+      a.gain.setValueAtTime(0,now); a.gain.linearRampToValueAtTime(.10/(k+1.3),now+.02);
+      a.gain.exponentialRampToValueAtTime(.0001,now+1.25);
+      o.connect(a).connect(actx.destination); o.start(now); o.stop(now+1.3);
+    });
+  }
+
+  var last=null;
+  function frame(t){
+    if(last===null)last=t;
+    var dt=Math.min((t-last)/1000,.05); last=t;
+    if(running&&!reduce){
+      var px=CW/1.35*dt;                       // one chord ~1.35s
+      for(var i=0;i<chords.length;i++) chords[i].x-=px;
+    }
+    var head=W*PH;
+    for(var i=0;i<chords.length;i++){
+      var c=chords[i];
+      if(!c.done && c.x<=head){ c.done=true; c.flash=1; sound(c.tok);
+        var el=document.getElementById('seqnow');
+        if(el) el.textContent=degree(c.tok)+'  \u2192  '+label(c.tok)+'   p='+c.p.toFixed(0)+'%';
+      }
+      if(c.flash>0)c.flash-=dt*1.7;
+    }
+    while(chords.length&&chords[0].x<-CW*1.4) chords.shift();
+    while(!chords.length||chords[chords.length-1].x<W+CW) push();
+    draw();
+    requestAnimationFrame(frame);
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    var bh=bandH(), i, j;
+    /* pitch field */
+    ctx.strokeStyle='#2B3549'; ctx.lineWidth=1;
+    for(i=0;i<12;i++){ var y=bandY(i)+bh/2; ctx.beginPath(); ctx.moveTo(56,y); ctx.lineTo(W,y); ctx.stroke(); }
+    ctx.font='400 11px "IBM Plex Mono",monospace'; ctx.textBaseline='middle';
+    for(i=0;i<12;i++){
+      ctx.fillStyle=(i===((12-key)%12))?'#D9A05B':'#5F6879';
+      ctx.textAlign='left'; ctx.fillText(NM[i],10,bandY(i));
+      ctx.textAlign='right'; ctx.fillStyle='#3D4652'; ctx.fillText(HZ[i].toFixed(0),52,bandY(i));
+    }
+    /* chords as stacked chord tones — the spectral read */
+    for(i=0;i<chords.length;i++){
+      var c=chords[i]; if(c.x>W+CW||c.x<-CW) continue;
+      var root=(TOK[c.tok][0]+key)%12, ivs=IVL[TOK[c.tok][1]]||[0,4,7];
+      var hovering=(hover===c);
+      for(j=0;j<ivs.length;j++){
+        var pc=(root+ivs[j])%12, y=bandY(pc)-bh*0.34;
+        ctx.globalAlpha=c.flash>0?1:(hovering?.95:.52+.10*j);
+        ctx.fillStyle=c.flash>0?'#F2D9A8':(j===0?'#D9A05B':'#8C6A3C');
+        ctx.fillRect(c.x,y,CW-9,bh*0.68);
+      }
+      ctx.globalAlpha=1;
+      ctx.fillStyle=c.flash>0?'#EDE9DF':'#98A1B2';
+      ctx.font='400 11px "IBM Plex Mono",monospace'; ctx.textAlign='left';
+      ctx.fillText(label(c.tok),c.x,TOP-24);
+      ctx.fillStyle='#5F6879'; ctx.fillText(degree(c.tok),c.x,TOP-10);
+      if(hovering){
+        ctx.strokeStyle='#FCEC0C'; ctx.lineWidth=1;
+        ctx.strokeRect(c.x-2,TOP-34,CW-5,H-TOP-BOT+42);
+        ctx.fillStyle='#FCEC0C'; ctx.fillText('p='+c.p.toFixed(0)+'%  click to steer',c.x,H-BOT+16);
+      }
+    }
+    /* playhead — red is the reserved mark */
+    var head=W*PH;
+    ctx.strokeStyle='#D8452F'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(head,TOP-34); ctx.lineTo(head,H-BOT+4); ctx.stroke();
+  }
+
+  cv.addEventListener('mousemove',function(e){
+    var r=cv.getBoundingClientRect(), mx=e.clientX-r.left, best=null;
+    for(var i=0;i<chords.length;i++){ var c=chords[i]; if(mx>=c.x&&mx<c.x+CW-9){best=c;break} }
+    hover=best; cv.style.cursor=best?'pointer':'default'; if(reduce)draw();
+  });
+  cv.addEventListener('mouseleave',function(){hover=null;if(reduce)draw();});
+  cv.addEventListener('click',function(e){
+    var r=cv.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
+    if(mx<56){ var bh2=bandH(), idx=Math.round((TOP+(H-TOP-BOT)-my-bh2/2)/bh2);
+      idx=Math.max(0,Math.min(11,idx)); key=(12-idx)%12;
+      document.getElementById('seqkey').textContent='key of '+NM[(0+key)%12]+' \u00b7 click a row to transpose';
+      draw(); return; }
+    if(hover){ cur=hover.tok;                       // re-seed the chain here
+      for(var i=chords.length-1;i>=0;i--) if(chords[i].x>hover.x) chords.splice(i,1);
+      while(chords[chords.length-1].x<W+CW) push(); draw(); }
+  });
+
+  document.getElementById('seqaudio').addEventListener('click',function(){
+    audio=!audio; this.setAttribute('aria-pressed',String(audio));
+    this.textContent='chords: '+(audio?'on':'off');
+    if(audio&&!actx) actx=new (window.AudioContext||window.webkitAudioContext)();
+  });
+  document.getElementById('seqplay').addEventListener('click',function(){
+    running=!running; this.setAttribute('aria-pressed',String(running));
+    this.textContent=running?'running':'paused';
+  });
+
+  resize(); addEventListener('resize',function(){resize();draw()});
+  draw();
+  if(!reduce) requestAnimationFrame(frame);
 })();
 </script>
 </body>
