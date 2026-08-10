@@ -141,6 +141,45 @@ svg.score{display:block;width:100%;min-width:960px;height:auto}
 .sec-label::before{content:"";display:inline-block;width:9px;height:9px;
   border-left:2px solid var(--hud);border-top:2px solid var(--hud);margin-right:2px;transform:translateY(-2px)}
 
+
+/* ── responsive chrome: the HUD tracks the reader ───────────── */
+.chrome .c{transition:width .34s cubic-bezier(.2,.8,.3,1),height .34s cubic-bezier(.2,.8,.3,1),opacity .34s}
+.chrome.lock .c{width:40px;height:40px;opacity:1}
+.scan{opacity:calc(.05 + var(--boost,0) * .075);transition:opacity .25s linear}
+.readout{transition:opacity .2s}
+.chrome.lock .readout{opacity:.95}
+
+/* a lane in the rail that follows the pointer */
+.lane{position:absolute;left:0;right:0;height:1px;background:var(--hud);opacity:0;
+  transition:opacity .3s;pointer-events:none}
+.lane.on{opacity:.55}
+.lane::after{content:"";position:absolute;right:0;top:-2px;width:5px;height:5px;background:var(--hud)}
+
+/* section rules draw themselves in on entry */
+.sec-label::after{transform:scaleX(0);transform-origin:left center;transition:transform .8s cubic-bezier(.22,.61,.36,1)}
+.sec-label.in::after{transform:scaleX(1)}
+
+/* HUD selection on publication rows */
+.entry{position:relative}
+.entry::before{content:"";position:absolute;left:-19px;top:22px;width:9px;height:9px;
+  border-left:2px solid var(--hud);border-top:2px solid var(--hud);
+  opacity:0;transform:translateX(7px);transition:opacity .18s,transform .18s}
+.entry:hover::before{opacity:1;transform:none}
+.entry:hover .meta{color:var(--hud)}
+.entry .meta{transition:color .18s}
+/* same selection grammar on catalogue rows */
+.cat-row{position:relative}
+.cat-row::before{content:"";position:absolute;left:-15px;top:19px;width:7px;height:7px;
+  border-left:2px solid var(--hud);border-top:2px solid var(--hud);
+  opacity:0;transform:translateX(6px);transition:opacity .18s,transform .18s}
+.cat-row:hover::before{opacity:1;transform:none}
+
+@media (prefers-reduced-motion:reduce){
+  .sec-label::after{transform:none}
+  .chrome.lock .c{width:22px;height:22px}
+  .lane{display:none}
+}
+
 /* ── the visualiser: notes + frequency-ratio operators ──────── */
 .viz{position:relative;margin-top:34px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(10,7,20,.5)}
 .viz canvas{display:block;width:100%;height:clamp(320px,58vh,540px);touch-action:none}
@@ -209,7 +248,7 @@ svg.score{display:block;width:100%;min-width:960px;height:auto}
 </nav>
 
 <div class="chrome" aria-hidden="true"><div class="scan"></div><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="readout" id="readout"><span class="dot"></span>sec 01 / hero &#183; fr 0000</div></div>
-<div class="rail" aria-hidden="true"><div class="rail-in"><div class="rail-col" id="spine"></div></div></div>
+<div class="rail" aria-hidden="true"><div class="rail-in"><div class="rail-col" id="spine"><div class="lane" id="lane"></div></div></div></div>
 
 <div class="sheet">
   <div class="spine" aria-hidden="true"></div><div class="margin" aria-hidden="true"></div>
@@ -412,20 +451,90 @@ Drawn as SVG and CSS &mdash; no gradients. Hand-built, no framework. The fan is 
   });
 })();
 
-/* the readout is the chrome's only moving part: section + frame, always on */
+/* ── one tracking system ─────────────────────────────────────────
+   Section acquisition (brackets lock + readout scrambles), a pointer lane
+   in the rail, and scan intensity driven by scroll velocity. All of it is
+   the same idea: the interface is following the reader. */
 (function(){
-  var out=document.getElementById('readout'); if(!out) return;
-  var secs=[].slice.call(document.querySelectorAll('section'));
-  function upd(){
-    var y=window.scrollY+window.innerHeight*0.34, cur=null, n=1;
-    for(var i=0;i<secs.length;i++){
-      var t=secs[i].getBoundingClientRect().top+window.scrollY;
-      if(t<=y){cur=secs[i];n=i+2}
-    }
-    var id=cur?cur.id:'hero', fr=String(Math.floor(window.scrollY/24)).padStart(4,'0');
-    out.innerHTML='<span class="dot"></span>sec '+String(cur?n:1).padStart(2,'0')+' / '+id+' &#183; fr '+fr;
+  var out=document.getElementById('readout'), chrome=document.querySelector('.chrome'),
+      lane=document.getElementById('lane'), root=document.documentElement;
+  if(!out) return;
+  var secs=[].slice.call(document.querySelectorAll('section')),
+      reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,
+      cur=null, scrambleT=null, GL='ABCDEFGHJKLMNPQRSTUVWXYZ0123456789/#*';
+
+  function label(n,id,fr){return 'sec '+String(n).padStart(2,'0')+' / '+id+' \u00b7 fr '+fr;}
+  function paint(txt){out.innerHTML='<span class="dot"></span>'+txt;}
+
+  function scramble(target){
+    if(reduce){paint(target);return;}
+    clearInterval(scrambleT);
+    var i=0;
+    scrambleT=setInterval(function(){
+      i++;
+      var shown=target.split('').map(function(ch,k){
+        if(ch===' '||ch==='/'||ch==='\u00b7') return ch;
+        return k < i*2 ? ch : GL[(Math.random()*GL.length)|0];
+      }).join('');
+      paint(shown);
+      if(i*2>=target.length){clearInterval(scrambleT);paint(target);}
+    },26);
   }
-  upd(); addEventListener('scroll',function(){requestAnimationFrame(upd)},{passive:true});
+
+  function which(){
+    var y=window.scrollY+window.innerHeight*0.34, c=null, n=1;
+    for(var i=0;i<secs.length;i++){
+      if(secs[i].getBoundingClientRect().top+window.scrollY<=y){c=secs[i];n=i+2}
+    }
+    return {el:c,n:c?n:1,id:c?c.id:'hero'};
+  }
+  function frame(){return String(Math.floor(window.scrollY/24)).padStart(4,'0');}
+
+  function upd(){
+    var w=which();
+    if(w.el!==cur){
+      cur=w.el;
+      scramble(label(w.n,w.id,frame()));
+      if(chrome){chrome.classList.add('lock');setTimeout(function(){chrome.classList.remove('lock')},420);}
+    } else if(!scrambleT || true){
+      if(!document.hidden) paint(label(w.n,w.id,frame()));
+    }
+  }
+
+  /* scan intensity rides scroll velocity */
+  var lastY=window.scrollY,lastT=performance.now(),boost=0;
+  function tick(){
+    var now=performance.now(),dy=Math.abs(window.scrollY-lastY),dt=Math.max(now-lastT,1);
+    var v=Math.min(dy/dt/2.2,1);
+    boost+= (v-boost)*0.18; if(boost<0.002)boost=0;
+    root.style.setProperty('--boost',boost.toFixed(3));
+    lastY=window.scrollY; lastT=now;
+    requestAnimationFrame(tick);
+  }
+  upd();
+  addEventListener('scroll',function(){requestAnimationFrame(function(){
+    var w=which();
+    if(w.el!==cur){upd();} else {paint(label(w.n,w.id,frame()));}
+  })},{passive:true});
+  if(!reduce) requestAnimationFrame(tick);
+
+  /* the rail follows the pointer */
+  if(lane && !reduce){
+    var py=0,pend=false;
+    addEventListener('pointermove',function(e){
+      py=e.clientY;
+      if(!pend){pend=true;requestAnimationFrame(function(){
+        lane.style.top=py+'px'; lane.classList.add('on'); pend=false;
+      });}
+    },{passive:true});
+    addEventListener('pointerleave',function(){lane.classList.remove('on')});
+  }
+
+  /* section rules draw in as they arrive */
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(en){ if(en.isIntersecting) en.target.classList.add('in'); });
+  },{threshold:.4});
+  document.querySelectorAll('.sec-label').forEach(function(l){io.observe(l)});
 })();
 </script>
 <script>
@@ -557,6 +666,14 @@ Drawn as SVG and CSS &mdash; no gradients. Hand-built, no framework. The fan is 
     var dt=Math.min((t-last)/1000,0.05); last=t;
     step(dt); draw(); requestAnimationFrame(loop);
   }
+
+  var lastSY=window.scrollY;
+  addEventListener('scroll',function(){
+    var d=window.scrollY-lastSY; lastSY=window.scrollY;
+    if(reduce||Math.abs(d)<1) return;
+    var k=Math.max(-1,Math.min(d/26,1));
+    for(var i=0;i<notes.length;i++){ notes[i].vy+=k*13; notes[i].vx+=k*4*(i%2?1:-1); }
+  },{passive:true});
 
   resize(); addEventListener('resize',function(){resize()});
   draw();
