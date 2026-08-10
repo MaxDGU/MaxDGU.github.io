@@ -58,7 +58,9 @@ a:hover,.nav a:hover{color:var(--cyan)}
 a:focus-visible,button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 
 .hero{min-height:44vh;display:flex;flex-direction:column;justify-content:flex-end}
-.hero .display{margin-bottom:5vh}
+.hero .display{margin-bottom:22px}
+.tagline{color:var(--dim);letter-spacing:.24em;text-transform:uppercase;margin-bottom:5vh}
+.tagline::before{content:"";display:inline-block;width:22px;height:1px;background:var(--hud);vertical-align:middle;margin-right:12px}
 
 
 /* ── themed bands: the game palettes, now carrying whole sections ── */
@@ -74,18 +76,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--cyan);outline-offse
 #contact{padding-top:16vh;padding-bottom:12vh}
 
 /* work: asymmetric 62/38 */
-.work-grid{display:grid;grid-template-columns:62% 38%;margin-top:44px}
-.idx{border-right:1px solid var(--line);padding-right:34px}
-.entry{padding:20px 0;border-bottom:1px solid var(--line)}
-.entry:first-child{border-top:1px solid var(--line)}
-.entry h3{font-family:var(--disp);font-weight:400;font-size:clamp(1.05rem,1.9vw,1.4rem);line-height:1.32}
-.entry .meta{margin-top:9px;font-family:var(--mono);font-size:var(--t-mono);color:var(--faint);letter-spacing:.1em;text-transform:uppercase}
 .more{display:inline-block;margin-top:26px;font-family:var(--mono);font-size:var(--t-mono-lg);color:var(--cyan);letter-spacing:.1em}
-.probe-field{padding-left:34px}
-svg.probe{display:block;width:100%;max-width:300px;height:auto}
-.probe .play{font-family:var(--mono);font-size:12px;fill:var(--dim)}
-.probe .pmeta{font-family:var(--mono);font-size:11px;fill:var(--faint);letter-spacing:.1em}
-.probe .pcode{font-family:var(--mono);font-size:11px;fill:var(--faint)}
 
 /* sound */
 .mute{font-family:var(--mono);font-size:var(--t-mono);letter-spacing:.12em;background:transparent;border:1px solid var(--line);color:var(--dim);padding:5px 11px;cursor:pointer;text-transform:uppercase}
@@ -131,13 +122,6 @@ svg.probe{display:block;width:100%;max-width:300px;height:auto}
 .sec-label.in::after{transform:scaleX(1)}
 
 /* HUD selection on publication rows */
-.entry{position:relative}
-.entry::before{content:"";position:absolute;left:-19px;top:22px;width:9px;height:9px;
-  border-left:2px solid var(--hud);border-top:2px solid var(--hud);
-  opacity:0;transform:translateX(7px);transition:opacity .18s,transform .18s}
-.entry:hover::before{opacity:1;transform:none}
-.entry:hover .meta{color:var(--hud)}
-.entry .meta{transition:color .18s}
 /* same selection grammar on catalogue rows */
 .cat-row{position:relative}
 .cat-row::before{content:"";position:absolute;left:-15px;top:19px;width:7px;height:7px;
@@ -161,6 +145,45 @@ svg.probe{display:block;width:100%;max-width:300px;height:auto}
 
 .seq{position:relative;margin-top:34px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(6,8,14,.62)}
 .seq canvas{display:block;width:100%;height:clamp(300px,50vh,430px);touch-action:none}
+
+
+/* work: a trajectory, with a bracketed slot per institution */
+.traj{margin-top:40px;border-top:1px solid var(--line)}
+/* .trow, not .tr — .tr is already the top-right corner-bracket token */
+.trow{display:grid;grid-template-columns:104px minmax(0,1fr) 190px 104px;align-items:center;
+  gap:20px;padding:22px 0;border-bottom:1px solid var(--line);position:relative;transition:background .2s}
+.trow:hover{background:rgba(252,236,12,.035)}
+.trow .yr{font-family:var(--mono);font-size:var(--t-mono);color:var(--faint);letter-spacing:.12em}
+.trow .what{font-family:var(--disp);font-size:clamp(1.15rem,2.1vw,1.6rem);line-height:1.25}
+.trow .where{font-family:var(--mono);font-size:var(--t-mono);color:var(--dim);letter-spacing:.1em;text-transform:uppercase}
+.trow:hover .where{color:var(--hud)}
+.slot{position:relative;display:block;height:56px;border:1px solid var(--line)}
+.slot em{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-style:normal;color:var(--faint);letter-spacing:.14em;text-transform:uppercase}
+.slot i{position:absolute;width:8px;height:8px;opacity:.85}
+.slot .b1{top:-1px;left:-1px;border-top:2px solid var(--hud);border-left:2px solid var(--hud)}
+.slot .b2{top:-1px;right:-1px;border-top:2px solid var(--hud);border-right:2px solid var(--hud)}
+.slot .b3{bottom:-1px;left:-1px;border-bottom:2px solid var(--hud);border-left:2px solid var(--hud)}
+.slot .b4{bottom:-1px;right:-1px;border-bottom:2px solid var(--hud);border-right:2px solid var(--hud)}
+.slot img{width:100%;height:100%;object-fit:contain;padding:9px}
+
+/* hazard chevrons — a cyberpunk rule, tiled hard-edged, used sparingly */
+.chev{height:9px;margin:0;border:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='9'%3E%3Cpath d='M0 9 L8 0 L16 0 L8 9 Z' fill='%23FCEC0C'/%3E%3C/svg%3E");
+  background-repeat:repeat-x;opacity:.16}
+
+/* bracketed frames on the live canvases */
+.viz,.seq{position:relative}
+.viz::before,.viz::after,.seq::before,.seq::after{content:"";position:absolute;width:16px;height:16px;pointer-events:none;z-index:2}
+.viz::before,.seq::before{top:8px;left:8px;border-top:2px solid var(--hud);border-left:2px solid var(--hud)}
+.viz::after,.seq::after{bottom:8px;right:8px;border-bottom:2px solid var(--hud);border-right:2px solid var(--hud)}
+
+/* nav tracks the section you are in */
+.nav a{position:relative;padding:2px 4px}
+.nav a.on{color:var(--hud)}
+.nav a.on::before,.nav a.on::after{content:"";position:absolute;width:5px;height:5px}
+.nav a.on::before{top:-3px;left:-3px;border-top:1px solid var(--hud);border-left:1px solid var(--hud)}
+.nav a.on::after{bottom:-3px;right:-3px;border-bottom:1px solid var(--hud);border-right:1px solid var(--hud)}
 
 /* the hard cut — now introducing reading */
 .cut{height:56vh;background:#000;display:flex;align-items:center;justify-content:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);position:relative}
@@ -202,10 +225,10 @@ svg.probe{display:block;width:100%;max-width:300px;height:auto}
   :root{--spine:44px;--margin:0px;--gut:18px}
   .sheet{grid-template-columns:var(--spine) minmax(0,1fr)}
   .margin{display:none}
-  .work-grid{grid-template-columns:1fr}
-  .idx{border-right:0;padding-right:0}
-  .probe-field{padding-left:0;margin-top:28px}
-  .cat{grid-template-columns:1fr;gap:0}
+        .cat{grid-template-columns:1fr;gap:0}
+  .trow{grid-template-columns:74px minmax(0,1fr);gap:6px 14px}
+  .trow .where{grid-column:2}
+  .trow .slot{grid-column:2;width:150px;height:46px;margin-top:8px}
   .page{margin-right:0;max-width:none}
         .cutlabel{left:20px;bottom:20px}
   .cutlabel.r{right:20px;left:auto}
@@ -227,7 +250,8 @@ svg.probe{display:block;width:100%;max-width:300px;height:auto}
 
 <div class="sheet">
   <div class="spine" aria-hidden="true"></div><div class="margin" aria-hidden="true"></div>
-  <div class="col"><header class="hero"><h1 class="display">Max<br>Gupta</h1></header></div>
+  <div class="col"><header class="hero"><h1 class="display">Max<br>Gupta</h1>
+<p class="tagline mono">AI researcher &#183; in stealth</p></header></div>
 </div>
 
 
@@ -235,20 +259,13 @@ svg.probe{display:block;width:100%;max-width:300px;height:auto}
 <div class="band band-edge">
     <div class="sheet">
     <div class="spine" aria-hidden="true"></div>
-    <div class="margin" aria-hidden="true"><div class="cam">sec 02 &#183; work<br>04 entries<br>layers 07<br>taps 03</div></div>
+    <div class="margin" aria-hidden="true"><div class="cam">sec 02 &#183; work<br>04 posts<br>2020&ndash;now</div></div>
     <div class="col">
       <section id="work">
         <h2 class="sec-label">work</h2>
-        <div class="work-grid">
-          <div class="idx">
-            <div class="entry"><h3>Convolutional Neural Networks Can (Meta&#8209;)Learn the Same&#8209;Different Relation</h3><p class="meta">Cognitive Science Society &middot; 2025</p></div>
-            <div class="entry"><h3>Teasing Apart Architecture and Initial Weights as Sources of Inductive Bias in Neural Networks</h3><p class="meta">Cognitive Science Society &middot; 2025</p></div>
-            <div class="entry"><h3>Meta&#8209;Learning Captures Human&#8209;Like Geometric Sensitivity</h3><p class="meta">Cognitive Science Society &middot; 2026</p></div>
-            <div class="entry"><h3>Inductive Biases for Relational Reasoning in Neural Networks</h3><p class="meta">Princeton University &middot; 2026</p></div>
-            <a class="more" href="https://scholar.google.com/citations?user=8n1BqYUAAAAJ&amp;hl=en">all publications &#8594; google scholar</a>
-          </div>
-          <div class="probe-field"><svg class="probe" viewBox="0 0 300 460" role="img" aria-label="Linear probes tapped across conv and fc layers of a vision model"><title>Layer-wise probe taps &mdash; conv1&ndash;fc3</title><text class="pmeta" x="14" y="20">stimuli</text><g transform="translate(40,30)"><polygon points="-16,26 16,26 0,0" fill="#2E5BD8"/><text class="pcode" x="0" y="40" text-anchor="middle">0010</text></g><g transform="translate(96,30)"><polygon points="-14,26 -11,26 -11,17.04" fill="#2E5BD8"/><polygon points="-8,26 -5,26 -5,11.919999999999998" fill="#2E5BD8"/><polygon points="-2,26 1,26 1,6.799999999999997" fill="#2E5BD8"/><polygon points="4,26 7,26 7,11.919999999999998" fill="#2E5BD8"/><polygon points="10,26 13,26 13,17.04" fill="#2E5BD8"/><polygon points="-16,26 16,26 0,0" fill="none" stroke="#2E5BD8" stroke-width="1"/><text class="pcode" x="0" y="40" text-anchor="middle">0011</text></g><g transform="translate(152,30)"><polygon points="-16,26 16,26 0,0" fill="#D8452F"/><text class="pcode" x="0" y="40" text-anchor="middle">1010</text></g><g transform="translate(208,30)"><polygon points="-14,26 -11,26 -11,17.04" fill="#D8452F"/><polygon points="-8,26 -5,26 -5,11.919999999999998" fill="#D8452F"/><polygon points="-2,26 1,26 1,6.799999999999997" fill="#D8452F"/><polygon points="4,26 7,26 7,11.919999999999998" fill="#D8452F"/><polygon points="10,26 13,26 13,17.04" fill="#D8452F"/><polygon points="-16,26 16,26 0,0" fill="none" stroke="#D8452F" stroke-width="1"/><text class="pcode" x="0" y="40" text-anchor="middle">1110</text></g><line x1="14" y1="86" x2="286" y2="86" stroke="#2B3549"/><rect x="60" y="104" width="150" height="28" fill="#151C2B" stroke="#2B3549"/><text class="play" x="52" y="123" text-anchor="end">conv1</text><line x1="135" y1="132" x2="135" y2="148" stroke="#2B3549"/><rect x="60" y="148" width="150" height="28" fill="#151C2B" stroke="#2B3549"/><text class="play" x="52" y="167" text-anchor="end">conv2</text><line x1="135" y1="176" x2="135" y2="192" stroke="#2B3549"/><rect x="60" y="192" width="150" height="28" fill="#151C2B" stroke="#2B3549"/><text class="play" x="52" y="211" text-anchor="end">conv3</text><line x1="135" y1="220" x2="135" y2="236" stroke="#2B3549"/><rect x="60" y="236" width="150" height="28" fill="#151C2B" stroke="#2B3549"/><text class="play" x="52" y="255" text-anchor="end">conv4</text><line x1="210" y1="250" x2="252" y2="250" stroke="#D8452F" stroke-width="1.5"/><circle cx="252" cy="250" r="3.5" fill="#D8452F"/><line x1="135" y1="264" x2="135" y2="280" stroke="#2B3549"/><rect x="60" y="280" width="150" height="28" fill="#151C2B" stroke="#2B3549"/><text class="play" x="52" y="299" text-anchor="end">fc1</text><line x1="210" y1="294" x2="252" y2="294" stroke="#D8452F" stroke-width="1.5"/><circle cx="252" cy="294" r="3.5" fill="#D8452F"/><line x1="135" y1="308" x2="135" y2="324" stroke="#2B3549"/><rect x="60" y="324" width="150" height="28" fill="#151C2B" stroke="#2B3549"/><text class="play" x="52" y="343" text-anchor="end">fc2</text><line x1="210" y1="338" x2="252" y2="338" stroke="#D8452F" stroke-width="1.5"/><circle cx="252" cy="338" r="3.5" fill="#D8452F"/><line x1="135" y1="352" x2="135" y2="368" stroke="#2B3549"/><rect x="60" y="368" width="150" height="28" fill="#151C2B" stroke="#2B3549"/><text class="play" x="52" y="387" text-anchor="end">fc3</text><text class="pmeta" x="286" y="98" text-anchor="end">linear probe</text><text class="pmeta" x="14" y="440">relational &#183; same&ndash;different &#183; RMTS</text></svg></div>
-        </div>
+        <div class="traj"><div class="trow"><span class="yr">2020</span><span class="what">music</span><span class="where">IRCAM, Centre Pompidou</span><span class="slot" data-logo="ircam"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><em class="mono">ircam</em></span></div><div class="trow"><span class="yr">2017&ndash;21</span><span class="what">mathematics</span><span class="where">Columbia University</span><span class="slot" data-logo="columbia"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><em class="mono">columbia</em></span></div><div class="trow"><span class="yr">2024&ndash;26</span><span class="what">cognitive science &amp; AI</span><span class="where">Princeton University</span><span class="slot" data-logo="princeton"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><em class="mono">princeton</em></span></div><div class="trow"><span class="yr">now</span><span class="what">AI research</span><span class="where">in stealth</span><span class="slot" data-logo="prior"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><em class="mono">prior</em></span></div></div>
+<!-- logo slot: drop a file at assets/logos/<key>.svg (or .png) and it renders in place -->
+        <a class="more" href="https://scholar.google.com/citations?user=8n1BqYUAAAAJ&amp;hl=en">publications &#8594; google scholar</a>
       </section>
     </div>
   </div>
@@ -291,7 +308,7 @@ svg.probe{display:block;width:100%;max-width:300px;height:auto}
   </div>
 </div>
 
-<div class="cut">
+<hr class="chev"><div class="cut">
   <div class="cutmarks" aria-hidden="true">
     <span class="cm tl"></span><span class="cm tr"></span><span class="cm bl"></span><span class="cm br"></span>
     <i class="cutlabel">cut 04 &#183; 56 fr &#183; hold</i><i class="cutlabel r">sec 04 / reading</i>
@@ -419,6 +436,9 @@ Drawn as SVG and CSS &mdash; no gradients. Hand-built, no framework. The fan is 
     if(w.el!==cur){
       cur=w.el;
       scramble(label(w.n,w.id,frame()));
+      document.querySelectorAll('.nav a').forEach(function(a){
+        a.classList.toggle('on', a.getAttribute('href')==='#'+w.id);
+      });
       if(chrome){chrome.classList.add('lock');setTimeout(function(){chrome.classList.remove('lock')},420);}
     } else if(!scrambleT || true){
       if(!document.hidden) paint(label(w.n,w.id,frame()));
@@ -774,6 +794,23 @@ Drawn as SVG and CSS &mdash; no gradients. Hand-built, no framework. The fan is 
   resize(); addEventListener('resize',function(){resize();draw()});
   draw();
   if(!reduce) requestAnimationFrame(frame);
+})();
+</script>
+
+<script>
+/* Drop assets/logos/<key>.svg or .png and the slot fills itself.
+   Nothing to edit here — the bracketed frame is the fallback. */
+(function(){
+  document.querySelectorAll('.slot[data-logo]').forEach(function(sl){
+    var key=sl.dataset.logo, tried=['svg','png','jpg'], i=0;
+    (function attempt(){
+      if(i>=tried.length) return;
+      var im=new Image();
+      im.onload=function(){ sl.querySelector('em').remove(); sl.appendChild(im); };
+      im.onerror=function(){ i++; attempt(); };
+      im.alt=key; im.src='assets/logos/'+key+'.'+tried[i];
+    })();
+  });
 })();
 </script>
 </body>
