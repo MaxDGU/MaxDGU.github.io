@@ -150,8 +150,6 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--cyan);outline-offse
 /* work: a trajectory, with a bracketed slot per institution */
 .traj{margin-top:40px;border-top:1px solid var(--line)}
 /* .trow, not .tr — .tr is already the top-right corner-bracket token */
-.trow{display:grid;grid-template-columns:104px minmax(0,1fr) 190px 104px;align-items:center;
-  gap:20px;padding:22px 0;border-bottom:1px solid var(--line);position:relative;transition:background .2s}
 .trow:hover{background:rgba(252,236,12,.035)}
 .trow .yr{font-family:var(--mono);font-size:var(--t-mono);color:var(--faint);letter-spacing:.12em}
 .trow .what{font-family:var(--disp);font-size:clamp(1.15rem,2.1vw,1.6rem);line-height:1.25}
@@ -166,6 +164,22 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--cyan);outline-offse
 .slot .b3{bottom:-1px;left:-1px;border-bottom:2px solid var(--hud);border-left:2px solid var(--hud)}
 .slot .b4{bottom:-1px;right:-1px;border-bottom:2px solid var(--hud);border-right:2px solid var(--hud)}
 .slot img{width:100%;height:100%;object-fit:contain;padding:9px}
+
+
+/* the trajectory reads as a route: a spine with nodes, not a list */
+.traj{margin-top:42px;position:relative;padding-left:26px}
+.traj::before{content:"";position:absolute;left:5px;top:26px;bottom:26px;width:1px;background:var(--line)}
+.trow{display:grid;grid-template-columns:96px minmax(0,1fr) 168px 200px 92px;align-items:center;
+  gap:18px;padding:26px 0;border-bottom:1px solid var(--line);position:relative;transition:background .2s}
+.trow:first-child{border-top:1px solid var(--line)}
+.trow .node{position:absolute;left:-26px;top:50%;margin-top:-4px;width:9px;height:9px;
+  border:1px solid var(--faint);background:var(--void);transition:all .2s}
+.trow:hover .node{border-color:var(--hud);background:var(--hud);transform:rotate(45deg)}
+.repo{font-family:var(--mono);font-size:var(--t-mono);color:var(--dim);letter-spacing:.06em;line-height:1.5}
+.repo .gh{color:var(--hud);margin-right:7px}
+.repo em{display:block;font-style:normal;color:var(--faint);margin-top:3px;letter-spacing:.04em}
+.repo:hover{color:var(--hud)}
+.repo.none{color:var(--faint)}
 
 /* hazard chevrons — a cyberpunk rule, tiled hard-edged, used sparingly */
 .chev{height:9px;margin:0;border:0;
@@ -226,7 +240,9 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--cyan);outline-offse
   .sheet{grid-template-columns:var(--spine) minmax(0,1fr)}
   .margin{display:none}
         .cat{grid-template-columns:1fr;gap:0}
-  .trow{grid-template-columns:74px minmax(0,1fr);gap:6px 14px}
+  .traj{padding-left:20px}
+  .trow{grid-template-columns:70px minmax(0,1fr);gap:5px 12px}
+  .trow .repo{grid-column:2}
   .trow .where{grid-column:2}
   .trow .slot{grid-column:2;width:150px;height:46px;margin-top:8px}
   .page{margin-right:0;max-width:none}
@@ -263,7 +279,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--cyan);outline-offse
     <div class="col">
       <section id="work">
         <h2 class="sec-label">work</h2>
-        <div class="traj"><div class="trow"><span class="yr">2020</span><span class="what">music</span><span class="where">IRCAM, Centre Pompidou</span><span class="slot" data-logo="ircam"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><em class="mono">ircam</em></span></div><div class="trow"><span class="yr">2017&ndash;21</span><span class="what">mathematics</span><span class="where">Columbia University</span><span class="slot" data-logo="columbia"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><em class="mono">columbia</em></span></div><div class="trow"><span class="yr">2024&ndash;26</span><span class="what">cognitive science &amp; AI</span><span class="where">Princeton University</span><span class="slot" data-logo="princeton"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><em class="mono">princeton</em></span></div><div class="trow"><span class="yr">now</span><span class="what">AI research</span><span class="where">in stealth</span><span class="slot" data-logo="prior"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><em class="mono">prior</em></span></div></div>
+        <div class="traj"><div class="trow"><span class="node" aria-hidden="true"></span><span class="yr">2020</span><span class="what">music</span><span class="where">IRCAM, Centre Pompidou</span><a class="repo" href="https://github.com/MaxDGU/Musical-Markov-Chains"><span class="gh">&#9656;</span>Musical-Markov-Chains<em>markov models for algorithmic composition</em></a><span class="slot" data-logo="ircam"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><em class="mono">ircam</em></span></div><div class="trow"><span class="node" aria-hidden="true"></span><span class="yr">2017&ndash;21</span><span class="what">mathematics</span><span class="where">Columbia University</span><a class="repo" href="https://github.com/MaxDGU/bayesian_uncertainty"><span class="gh">&#9656;</span>bayesian_uncertainty<em>ensembling VAEs for cell-state posteriors</em></a><span class="slot" data-logo="columbia"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><em class="mono">columbia</em></span></div><div class="trow"><span class="node" aria-hidden="true"></span><span class="yr">2024&ndash;26</span><span class="what">cognitive science &amp; AI</span><span class="where">Princeton University</span><a class="repo" href="https://github.com/MaxDGU/metasamedifferent"><span class="gh">&#9656;</span>metasamedifferent<em>meta-learning the same&ndash;different relation</em></a><span class="slot" data-logo="princeton"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><em class="mono">princeton</em></span></div><div class="trow"><span class="node" aria-hidden="true"></span><span class="yr">now</span><span class="what">AI research</span><span class="where">in stealth</span><span class="repo none">&#8212;</span><span class="slot" data-logo="prior"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><em class="mono">prior</em></span></div></div>
 <!-- logo slot: drop a file at assets/logos/<key>.svg (or .png) and it renders in place -->
         <a class="more" href="https://scholar.google.com/citations?user=8n1BqYUAAAAJ&amp;hl=en">publications &#8594; google scholar</a>
       </section>
