@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>worlds — max gupta</title>
+<meta name="description" content="worlds — two rotations, books and music">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2016'%3E%3Cellipse%20cx='7.2'%20cy='10'%20rx='4.6'%20ry='3.2'%20fill='%23B4834C'%20transform='rotate(-20%207.2%2010)'/%3E%3Cline%20x1='11.2'%20y1='9'%20x2='11.2'%20y2='1.6'%20stroke='%23B4834C'%20stroke-width='1.3'/%3E%3C/svg%3E">
+<style>
+:root{
+  --paper:#EDE7DB;
+  --ink:#17191D;
+  --accent:#B4834C;
+  --hairline:rgba(237,231,219,.14);
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --serif:Georgia,"Times New Roman",serif;
+  --ease:cubic-bezier(.3,.7,.3,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  background:linear-gradient(180deg,#1b1e24 0%,var(--ink) 46%,#14161a 100%);
+  color:var(--paper);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- the ground: staves, lamplight, one grain ----------
+   Everything in .bg is fixed, inert, and kept at a whisper — the
+   names stay the loudest thing on the page by a wide margin. */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.lamp{
+  position:absolute;right:-18vmax;bottom:-22vmax;
+  width:72vmax;height:72vmax;
+  background:radial-gradient(closest-side,rgba(180,131,76,.10) 0%,rgba(180,131,76,.045) 42%,rgba(180,131,76,0) 72%);
+}
+.staff{
+  position:absolute;left:-6vw;width:112vw;height:96px;
+  opacity:.06;
+}
+.staff.s1{top:15%;animation:drift 110s linear infinite alternate}
+.staff.s2{top:46%;animation:drift 145s linear infinite alternate-reverse}
+.staff.s3{top:78%;animation:drift 95s linear infinite alternate}
+@keyframes drift{
+  from{transform:translateX(-18px)}
+  to{transform:translateX(18px)}
+}
+.grain{
+  position:absolute;inset:0;width:100%;height:100%;
+  opacity:.04;
+}
+
+/* ---------- chrome ---------- */
+#mark{
+  position:fixed;top:22px;left:26px;z-index:10;
+  font-family:var(--serif);
+  font-size:14px;letter-spacing:.34em;text-transform:uppercase;
+  color:rgba(237,231,219,.62);
+  pointer-events:none;
+}
+#back{
+  position:fixed;top:18px;right:22px;z-index:10;
+  font-family:var(--mono);font-size:14px;
+  letter-spacing:.26em;text-transform:uppercase;
+  color:rgba(237,231,219,.55);
+  text-decoration:none;
+  border:1px solid var(--hairline);
+  padding:7px 14px 6px 16px;
+  transition:color 160ms var(--ease),border-color 160ms var(--ease);
+}
+#back:hover{color:var(--paper);border-color:rgba(237,231,219,.35)}
+#back:focus-visible{outline:1px solid var(--accent);outline-offset:3px;color:var(--paper)}
+
+/* ---------- the two rotations ----------
+   A centred pair with a wide held gap between them — books on the
+   left, music on the right, plenty of quiet around both. */
+main{
+  position:relative;z-index:1;
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  gap:clamp(72px,11vw,190px);
+  padding:15vh 6vw 10vh;
+}
+.rot{margin:0}
+.rot h2{
+  margin:0 0 .9em;
+  font-family:var(--serif);font-weight:400;
+  font-variant:small-caps;
+  font-size:15px;letter-spacing:.32em;
+  color:rgba(180,131,76,.82);
+}
+.names{list-style:none;margin:0;padding:0}
+.n{
+  position:relative;
+  font-family:var(--serif);
+  font-size:clamp(32px,min(3.4vw,4.8vh),52px);
+  line-height:1.18;
+  padding:.3em 0 .3em 1.1em;
+  color:rgba(237,231,219,.66);
+  cursor:default;outline:none;
+  transition:opacity 160ms var(--ease),color 160ms var(--ease);
+}
+
+/* the one silent distinction: musicians lean */
+.n.m{font-style:italic}
+
+/* the brass tick — slides in beside the name under the hand */
+.n::before{
+  content:"";
+  position:absolute;left:0;top:50%;
+  width:6px;height:6px;
+  margin-top:-3px;
+  background:var(--accent);
+  transform:translateX(-8px) rotate(45deg);
+  opacity:0;
+  transition:opacity 160ms var(--ease),transform 160ms var(--ease);
+}
+.n:hover,.n:focus-visible{color:var(--paper)}
+.n:hover::before,.n:focus-visible::before{
+  opacity:1;
+  transform:translateX(0) rotate(45deg);
+}
+
+/* when one name is lit, the rest of its rotation recedes */
+.names:hover .n:not(:hover):not(:focus),
+.names:focus-within .n:not(:focus){
+  opacity:.4;
+}
+
+/* phone — one stack: books, then music, same rhythm */
+@media (max-width:600px){
+  main{
+    flex-direction:column;align-items:flex-start;justify-content:flex-start;
+    gap:8vh;
+    min-height:0;
+    padding:16vh 8vw 12vh;
+  }
+  .n{padding-left:1em}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .staff{animation:none !important;transform:none}
+  .n,.n::before,#back{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true">
+  <div class="lamp"></div>
+<svg class="staff s1" viewBox="0 0 1440 96" preserveAspectRatio="none" fill="none" stroke="#EDE7DB" stroke-width="1"><path d="M 0,18.0 L 80,20.5 L 160,21.1 L 240,19.4 L 320,16.6 L 400,14.9 L 480,15.5 L 560,18.0 L 640,20.5 L 720,21.1 L 800,19.4 L 880,16.6 L 960,14.9 L 1040,15.5 L 1120,18.0 L 1200,20.5 L 1280,21.1 L 1360,19.4 L 1440,16.6 L 1440,16.6"/><path d="M 0,33.3 L 80,34.1 L 160,31.8 L 240,28.2 L 320,25.9 L 400,26.7 L 480,30.0 L 560,33.3 L 640,34.1 L 720,31.8 L 800,28.2 L 880,25.9 L 960,26.7 L 1040,30.0 L 1120,33.3 L 1200,34.1 L 1280,31.8 L 1360,28.2 L 1440,25.9 L 1440,25.9"/><path d="M 0,44.8 L 80,43.2 L 160,40.7 L 240,39.2 L 320,39.8 L 400,42.0 L 480,44.3 L 560,44.8 L 640,43.2 L 720,40.7 L 800,39.2 L 880,39.8 L 960,42.0 L 1040,44.3 L 1120,44.8 L 1200,43.2 L 1280,40.7 L 1360,39.2 L 1440,39.8 L 1440,39.8"/><path d="M 0,54.9 L 80,53.0 L 160,51.9 L 240,52.3 L 320,54.0 L 400,55.7 L 480,56.1 L 560,54.9 L 640,53.0 L 720,51.9 L 800,52.3 L 880,54.0 L 960,55.7 L 1040,56.1 L 1120,54.9 L 1200,53.0 L 1280,51.9 L 1360,52.3 L 1440,54.0 L 1440,54.0"/><path d="M 0,64.4 L 80,62.4 L 160,63.2 L 240,66.0 L 320,68.9 L 400,69.6 L 480,67.6 L 560,64.4 L 640,62.4 L 720,63.2 L 800,66.0 L 880,68.9 L 960,69.6 L 1040,67.6 L 1120,64.4 L 1200,62.4 L 1280,63.2 L 1360,66.0 L 1440,68.9 L 1440,68.9"/></svg>
+<svg class="staff s2" viewBox="0 0 1440 96" preserveAspectRatio="none" fill="none" stroke="#EDE7DB" stroke-width="1"><path d="M 0,22.2 L 80,19.2 L 160,15.6 L 240,13.3 L 320,13.8 L 400,16.8 L 480,20.4 L 560,22.7 L 640,22.2 L 720,19.2 L 800,15.6 L 880,13.3 L 960,13.8 L 1040,16.8 L 1120,20.4 L 1200,22.7 L 1280,22.2 L 1360,19.2 L 1440,15.6 L 1440,15.6"/><path d="M 0,30.4 L 80,28.2 L 160,27.0 L 240,27.6 L 320,29.6 L 400,31.8 L 480,33.0 L 560,32.4 L 640,30.4 L 720,28.2 L 800,27.0 L 880,27.6 L 960,29.6 L 1040,31.8 L 1120,33.0 L 1200,32.4 L 1280,30.4 L 1360,28.2 L 1440,27.0 L 1440,27.0"/><path d="M 0,40.0 L 80,39.1 L 160,39.9 L 240,41.9 L 320,44.0 L 400,44.9 L 480,44.1 L 560,42.1 L 640,40.0 L 720,39.1 L 800,39.9 L 880,41.9 L 960,44.0 L 1040,44.9 L 1120,44.1 L 1200,42.1 L 1280,40.0 L 1360,39.1 L 1440,39.9 L 1440,39.9"/><path d="M 0,49.3 L 80,51.0 L 160,54.4 L 240,57.6 L 320,58.7 L 400,57.0 L 480,53.6 L 560,50.4 L 640,49.3 L 720,51.0 L 800,54.4 L 880,57.6 L 960,58.7 L 1040,57.0 L 1120,53.6 L 1200,50.4 L 1280,49.3 L 1360,51.0 L 1440,54.4 L 1440,54.4"/><path d="M 0,63.6 L 80,66.9 L 160,69.7 L 240,70.3 L 320,68.4 L 400,65.1 L 480,62.3 L 560,61.7 L 640,63.6 L 720,66.9 L 800,69.7 L 880,70.3 L 960,68.4 L 1040,65.1 L 1120,62.3 L 1200,61.7 L 1280,63.6 L 1360,66.9 L 1440,69.7 L 1440,69.7"/><ellipse cx="310" cy="42" rx="9" ry="6.5" transform="rotate(-16 310 42)" fill="#EDE7DB" stroke="none"/><ellipse cx="585" cy="30" rx="9" ry="6.5" transform="rotate(-16 585 30)" fill="#EDE7DB" stroke="none"/><ellipse cx="905" cy="54" rx="9" ry="6.5" transform="rotate(-16 905 54)" fill="#EDE7DB" stroke="none"/><ellipse cx="1230" cy="36" rx="9" ry="6.5" transform="rotate(-16 1230 36)" fill="#EDE7DB" stroke="none"/></svg>
+<svg class="staff s3" viewBox="0 0 1440 96" preserveAspectRatio="none" fill="none" stroke="#EDE7DB" stroke-width="1"><path d="M 0,15.8 L 80,16.3 L 160,18.5 L 240,20.2 L 320,19.7 L 400,17.5 L 480,15.8 L 560,16.3 L 640,18.5 L 720,20.2 L 800,19.7 L 880,17.5 L 960,15.8 L 1040,16.3 L 1120,18.5 L 1200,20.2 L 1280,19.7 L 1360,17.5 L 1440,15.8 L 1440,15.8"/><path d="M 0,27.3 L 80,30.2 L 160,32.9 L 240,32.7 L 320,29.8 L 400,27.1 L 480,27.3 L 560,30.2 L 640,32.9 L 720,32.7 L 800,29.8 L 880,27.1 L 960,27.3 L 1040,30.2 L 1120,32.9 L 1200,32.7 L 1280,29.8 L 1360,27.1 L 1440,27.3 L 1440,27.3"/><path d="M 0,41.6 L 80,45.8 L 160,46.2 L 240,42.4 L 320,38.2 L 400,37.8 L 480,41.6 L 560,45.8 L 640,46.2 L 720,42.4 L 800,38.2 L 880,37.8 L 960,41.6 L 1040,45.8 L 1120,46.2 L 1200,42.4 L 1280,38.2 L 1360,37.8 L 1440,41.6 L 1440,41.6"/><path d="M 0,56.5 L 80,57.2 L 160,54.8 L 240,51.5 L 320,50.8 L 400,53.2 L 480,56.5 L 560,57.2 L 640,54.8 L 720,51.5 L 800,50.8 L 880,53.2 L 960,56.5 L 1040,57.2 L 1120,54.8 L 1200,51.5 L 1280,50.8 L 1360,53.2 L 1440,56.5 L 1440,56.5"/><path d="M 0,68.3 L 80,66.9 L 160,64.6 L 240,63.7 L 320,65.1 L 400,67.4 L 480,68.3 L 560,66.9 L 640,64.6 L 720,63.7 L 800,65.1 L 880,67.4 L 960,68.3 L 1040,66.9 L 1120,64.6 L 1200,63.7 L 1280,65.1 L 1360,67.4 L 1440,68.3 L 1440,68.3"/></svg>
+  <svg class="grain" aria-hidden="true">
+    <filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 0.93  0 0 0 0 0.91  0 0 0 0 0.86  0 0 0 0.5 0"/></filter>
+    <rect width="100%" height="100%" filter="url(#gr)"/>
+  </svg>
+</div>
+<div id="mark">worlds</div>
+<a id="back" href="index.html">&larr; field</a>
+<main>
+  <section class="rot" aria-labelledby="h-books">
+    <h2 id="h-books">my book rotation</h2>
+    <ol class="names">
+      <li class="n" tabindex="0">Karl Ove Knausgaard</li>
+      <li class="n" tabindex="0">Paul Auster</li>
+      <li class="n" tabindex="0">Ellen Ullman</li>
+      <li class="n" tabindex="0">Gustave Flaubert</li>
+      <li class="n" tabindex="0">Haruki Murakami</li>
+    </ol>
+  </section>
+  <section class="rot" aria-labelledby="h-music">
+    <h2 id="h-music">my music rotation</h2>
+    <ol class="names">
+      <li class="n m" tabindex="0">Hania Rani</li>
+      <li class="n m" tabindex="0">Nils Frahm</li>
+      <li class="n m" tabindex="0">Nicolas Jaar</li>
+      <li class="n m" tabindex="0">Odesza</li>
+      <li class="n m" tabindex="0">Bob Moses</li>
+    </ol>
+  </section>
+</main>
+</body>
+</html>

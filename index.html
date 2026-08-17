@@ -1,51 +1,1262 @@
-<!DOCTYPE HTML>
-<html>
-	<head>
-		<title>Max's Portal</title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
-	</head>
-	<body class="is-preload">
-		<div id="wrapper">
-			<div id="bg"></div>
-			<div id="overlay"></div>
-			<div id="main">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>max gupta</title>
+<meta name="description" content="max gupta — notes, operators, and the space between">
+<meta property="og:title" content="max gupta">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2016'%3E%3Cellipse%20cx='7.2'%20cy='10'%20rx='4.6'%20ry='3.2'%20fill='%23B4834C'%20transform='rotate(-20%207.2%2010)'/%3E%3Cline%20x1='11.2'%20y1='9'%20x2='11.2'%20y2='1.6'%20stroke='%23B4834C'%20stroke-width='1.3'/%3E%3C/svg%3E">
+<style>
+:root{
+  --paper:#EDE7DB;
+  --ink:#17191D;
+  --ink-2:#23272E;
+  --navy:#1D2F45;
+  --oxblue:#4A6B84;
+  --tobacco:#8A6B4F;
+  --accent:#B4834C;
+  --hairline:rgba(237,231,219,.14);
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;overflow:hidden}
+body{
+  background:radial-gradient(130% 100% at 50% 42%, var(--navy) 0%, #1a2431 34%, var(--ink) 68%, #14161a 100%);
+  color:var(--paper);
+  -webkit-font-smoothing:antialiased;
+  user-select:none;
+}
+#stage{position:fixed;inset:0;overflow:hidden}
 
-				<!-- Header -->
-				<header id="header" style="max-height: 80vh; overflow-y: auto;">
-					<div class="profile-picture">
-						<img src="assets/css/images/1746652643092.jpeg" alt="Max Gupta" />
-					</div>
-					<h1>Max Gupta</h1>
-					<p> Psychology &#x2715; Computer Science </p>
-					<nav>
-						<ul>
-							<li><a href="https://github.com/MaxDGU" class="icon brands fa-github"><span class="label">Github</span></a></li>
-							<li><a href="https://substack.com/@maxgupta662811?/">Writing</a></li>
-							<li><a href="https://www.linkedin.com/in/max-g-991112a5/" class="icon brands fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
-							<li><a href="https://soundcloud.com/max-gupta-777538832">Sound</a></li>
-							<li><a href="https://scholar.google.com/citations?user=8n1BqYUAAAAJ&hl=en" target="_blank" class="icon google-scholar"><span class="label">Google Scholar</span></a></li>
-						</ul>
-					</nav>
+/* word-mark */
+#mark{
+  position:fixed;top:22px;left:26px;z-index:10;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:12px;letter-spacing:.34em;text-transform:uppercase;
+  color:rgba(237,231,219,.62);
+  pointer-events:none;
+}
 
-					<p> Hi there! I'm Max. I'm currently at <a href="https://www.princeton.edu/">Princeton University</a>, where I work in the <a href="https://cocosci.princeton.edu/">CoCoSci lab</a> with Professor Tom Griffiths on aligning neural networks with human inductive biases. Prior to 3-years of working as a consultant and software engineer, I received my Bachelor's in mathematics from <a href="https://www.columbia.edu/">Columbia University</a></p>
-					<nav>
-						<ul style="margin-top: 1em;">
-							<li><a href="mailto:mg7411@princeton.edu">Contact Me</a></li>
-							<li><a href="assets/Max Gupta CV-2026.pdf" download="Max_Gupta_Resume.pdf">Resume</a></li>
-						</ul>
-					</nav>
-				</header>
+/* entities */
+.ent{position:absolute;left:0;top:0;will-change:transform;pointer-events:none;
+  transform:translate3d(-9999px,-9999px,0)} /* parked off-canvas until placed */
+.ent .inner{transform:translate(-50%,-50%)}
+.op{
+  font-family:var(--mono);
+  font-weight:500;
+  line-height:1;
+  white-space:nowrap;
+  transform:translate(-50%,-50%);
+  text-shadow:0 0 14px rgba(23,25,29,.8);
+}
+.op.dyn{
+  color:var(--oxblue);
+  font-family:Georgia,"Times New Roman",serif;
+  font-style:italic;font-weight:400;
+}
+.op.struct{
+  color:var(--tobacco);
+  font-family:Georgia,"Times New Roman",serif;
+  font-weight:400;
+}
+.note svg{display:block}
 
-			</div>
-		</div>
+/* anchors: musical objects with a persistent small-caps label */
+.anchor{pointer-events:auto;cursor:pointer;outline:none;width:58px;height:58px;left:-29px;top:-29px;
+  display:block;text-decoration:none;color:inherit} /* anchors are real <a> elements */
+.anchor .inner{position:absolute;left:50%;top:50%}
+.anchor .alabel{
+  position:absolute;left:50%;top:calc(50% + 23px);
+  transform:translateX(-50%);
+  font-family:Georgia,"Times New Roman",serif;
+  font-variant:small-caps;
+  font-size:16px;font-weight:500;letter-spacing:.26em;
+  color:rgba(180,131,76,.78);white-space:nowrap;
+  /* part of the anchor's single hit area: clicks on the label activate
+     the enclosing <a> just like clicks on the note (one tab stop, one
+     link), hover styles match via .anchor:hover; padding + equal
+     negative margin fatten the hit area a few px without moving the text */
+  pointer-events:auto;cursor:pointer;user-select:none;
+  padding:5px 8px;margin:-5px -8px;
+  transition:color 120ms linear;
+  text-shadow:0 1px 6px rgba(23,25,29,.9);
+}
+.anchor:hover .alabel,.anchor:focus-visible .alabel{color:var(--accent)}
 
-		<script>
-			window.onload = function() { document.body.classList.remove('is-preload'); }
-			window.ontouchmove = function() { return false; }
-			window.onorientationchange = function() { document.body.scrollTop = 0; }
-		</script>
-	</body>
+/* transform ring — the only feedback the field ever gives */
+.ring{
+  position:absolute;left:0;top:0;width:92px;height:92px;
+  border:1px solid var(--accent);border-radius:50%;
+  pointer-events:none;opacity:0;
+  animation:ring .75s cubic-bezier(.2,.6,.3,1) forwards;
+}
+.ring.dim{border-color:var(--hairline)}
+@keyframes ring{
+  0%{opacity:.95;transform:translate(-50%,-50%) scale(.18)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1)}
+}
+
+/* controls — small caps, hairline, corner-anchored */
+.ctl{
+  position:fixed;bottom:20px;z-index:12;
+  font-family:var(--mono);font-size:11px;
+  letter-spacing:.28em;text-transform:uppercase;
+  color:rgba(237,231,219,.55);
+  background:transparent;
+  border:1px solid var(--hairline);
+  padding:7px 14px 6px 16px;
+  cursor:pointer;
+  transition:color .25s,border-color .25s;
+}
+.ctl:hover{color:var(--paper);border-color:rgba(237,231,219,.35)}
+.ctl.on,.ctl[aria-expanded="true"]{color:var(--accent);border-color:rgba(180,131,76,.45)}
+#btn-pause{left:22px}
+#btn-dyn{left:120px}
+#btn-sound{right:22px}
+
+/* dynamics drawer */
+#drawer{
+  position:fixed;left:22px;bottom:62px;z-index:11;
+  background:var(--ink-2);
+  border:1px solid var(--hairline);
+  padding:14px 16px 12px;
+  min-width:252px;
+}
+#drawer .row{display:flex;align-items:center;gap:10px;margin:8px 0}
+#drawer label{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(237,231,219,.6);width:88px;flex:none;
+}
+#drawer .val{
+  font-family:var(--mono);font-size:11px;
+  color:rgba(237,231,219,.78);width:34px;text-align:right;flex:none;
+}
+#drawer input[type=range]{
+  -webkit-appearance:none;appearance:none;
+  flex:1;min-width:96px;height:18px;background:transparent;cursor:pointer;margin:0;
+}
+#drawer input[type=range]::-webkit-slider-runnable-track{height:1px;background:rgba(237,231,219,.3)}
+#drawer input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:9px;height:9px;border-radius:50%;
+  background:var(--accent);border:none;margin-top:-4px;
+}
+#drawer input[type=range]::-moz-range-track{height:1px;background:rgba(237,231,219,.3)}
+#drawer input[type=range]::-moz-range-thumb{width:9px;height:9px;border-radius:50%;background:var(--accent);border:none}
+#drawer select{
+  flex:1;background:var(--ink);color:rgba(237,231,219,.8);
+  border:1px solid var(--hairline);
+  font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+  padding:4px 6px;cursor:pointer;
+}
+#drawer input:focus-visible,#drawer select:focus-visible{outline:1px solid var(--accent);outline-offset:3px}
+
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="mark"></div>
+<button class="ctl" id="btn-pause" aria-pressed="false">pause</button>
+<button class="ctl" id="btn-dyn" aria-expanded="false" aria-controls="drawer">dynamics</button>
+<button class="ctl" id="btn-sound" aria-pressed="false">sound</button>
+
+<div id="drawer" hidden>
+  <div class="row">
+    <label for="s-temp">temperature</label>
+    <input type="range" id="s-temp" min="0" max="2" step="0.01">
+    <span class="val" id="v-temp"></span>
+  </div>
+  <div class="row">
+    <label for="s-react">reactivity</label>
+    <input type="range" id="s-react" min="0" max="1" step="0.01">
+    <span class="val" id="v-react"></span>
+  </div>
+  <div class="row">
+    <label for="s-dens">density</label>
+    <input type="range" id="s-dens" min="6" max="24" step="1">
+    <span class="val" id="v-dens"></span>
+  </div>
+  <div class="row">
+    <label for="s-scale">scale</label>
+    <select id="s-scale">
+      <option value="chromatic">chromatic</option>
+      <option value="minor pentatonic">minor pentatonic</option>
+      <option value="major">major</option>
+      <option value="whole-tone">whole-tone</option>
+      <option value="dorian">dorian</option>
+    </select>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ==================== SITE — edit me =======================
+   This is the block to edit. Change the name and the six
+   anchor links here; everything else adapts.
+     label = hover caption + aria-label
+     url   = where the anchor navigates — external http(s)
+             links open in a new tab; mailto: and ./ open
+             normally in the same tab                       */
+var SITE={
+  name:"max gupta",
+  links:[
+    {id:"writing", label:"writing", url:"https://substack.com/@maxgupta662811"},
+    {id:"tech",    label:"tech",    url:"https://github.com/MaxDGU"},
+    {id:"sound",   label:"sound",   url:"https://soundcloud.com/max-gupta-777538832"},
+    {id:"scholar", label:"scholar", url:"https://scholar.google.com/citations?user=8n1BqYUAAAAJ&hl=en"},
+    {id:"worlds",  label:"worlds",  url:"./worlds.html"},
+    {id:"contact", label:"contact", url:"mailto:max@priorcomputers.ai"}
+  ]
+};
+
+/* ==================== PROGRESSION — tune me ================
+   The field starts simple and earns its complexity.
+   start    = operators on screen from the very first load
+   unlocks  = persistent interaction count at which a NEW
+              operator fades in at a screen edge (~2s, one
+              quiet ripple, no text). Operators never mutate;
+              the world only gains citizens.
+   chordCap = maximum tones per entity until cap5At
+              interactions, after which the cap rises to 5.  */
+var PROGRESSION={
+  start:["pp","pp","mp","mp","mf","mf","Σ","Σ"],
+  unlocks:[
+    {at:5,  op:"f"},
+    {at:12, op:"∏"},
+    {at:22, op:"∮"}
+  ],
+  chordCap:4,
+  cap5At:35
+};
+/* ================== end of CONFIG ======================== */
+
+/* ---------- constants ---------- */
+var PAPER="237,231,219";
+var MIN_CLAMP=36, MAX_CLAMP=96;
+var NOTE_MIN=48, NOTE_MAX=84;               /* C3–C6 */
+var NOTE_NAMES=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+var stage=document.getElementById("stage");
+var reduced=window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function rand(a,b){return a+Math.random()*(b-a);}
+function nameOf(m){return NOTE_NAMES[((m%12)+12)%12]+(Math.floor(m/12)-1);}
+function freqOf(m){return 440*Math.pow(2,(m-69)/12);}
+
+/* ---------- dynamics settings (persisted) ---------- */
+var LS_KEY="site-dynamics-v2";
+var DEFAULTS={temperature:1.0, reactivity:1.0, density:18, scale:"chromatic"};
+var SCALES={
+  "chromatic":[0,1,2,3,4,5,6,7,8,9,10,11],
+  "minor pentatonic":[0,3,5,7,10],
+  "major":[0,2,4,5,7,9,11],
+  "whole-tone":[0,2,4,6,8,10],
+  "dorian":[0,2,3,5,7,9,10]
+};
+var settings={};
+for(var k0 in DEFAULTS) settings[k0]=DEFAULTS[k0];
+try{
+  var stored=JSON.parse(localStorage.getItem(LS_KEY)||"null");
+  if(stored) for(var k1 in DEFAULTS){
+    if(stored[k1]!==undefined) settings[k1]=stored[k1];
+  }
+  if(!SCALES[settings.scale]) settings.scale=DEFAULTS.scale;
+}catch(e){}
+function saveSettings(){
+  try{ localStorage.setItem(LS_KEY,JSON.stringify(settings)); }catch(e){}
+}
+
+/* ---------- interaction counter (persisted) ----------
+   Every transform or fusion counts. Reload resets the field
+   but keeps this number — the world remembers how much
+   music has been made in it.                            */
+var LS_PROG="site-progression-v1";
+var interactions=0;
+try{ interactions=Math.max(0,parseInt(localStorage.getItem(LS_PROG)||"0",10)||0); }catch(e){}
+function bumpInteractions(){
+  interactions++;
+  try{ localStorage.setItem(LS_PROG,String(interactions)); }catch(e){}
+  checkProgression();
+}
+function toneCap(){ return interactions>=PROGRESSION.cap5At ? 5 : PROGRESSION.chordCap; }
+
+/* nearest scale tone (semitone classes mod 12); chromatic is identity */
+function snapToScale(midi){
+  var tones=SCALES[settings.scale]||SCALES.chromatic;
+  if(tones.length===12) return midi;
+  var pc=((midi%12)+12)%12;
+  for(var d=0;d<=6;d++){
+    if(tones.indexOf((pc+d)%12)>=0) return midi+d;
+    if(tones.indexOf(((pc-d)%12+12)%12)>=0) return midi-d;
+  }
+  return midi;
+}
+function snapSet(set){
+  var out=[];
+  set.forEach(function(m){ var s=snapToScale(m); if(out.indexOf(s)<0) out.push(s); });
+  return out.sort(function(a,b){return a-b;});
+}
+
+/* ---------- note geometry ----------
+   Lower average pitch -> slightly larger head (18–30px).
+   Brightness follows register: higher pitch reads brighter.
+   Loudness (dynamics state) modulates both: pp faint/slightly
+   smaller, ff full paper/slightly larger (±25% at most). */
+function headSize(midi){           /* head width in px */
+  return 30-(Math.min(NOTE_MAX,Math.max(NOTE_MIN,midi))-NOTE_MIN)/3; /* 30 → 18 */
+}
+function brightness(midi){         /* 0.55 … 1.0 */
+  return 0.55+0.45*Math.min(1,Math.max(0,(midi-MIN_CLAMP)/(MAX_CLAMP-MIN_CLAMP)));
+}
+function avgOf(t){ var s=0,i; for(i=0;i<t.length;i++) s+=t[i]; return s/t.length; }
+
+/* ---------- loudness states ---------- */
+var DYN_LEVELS=["pp","p","mp","mf","f","ff"];
+var DYN_GAIN={pp:0.02,p:0.035,mp:0.05,mf:0.07,f:0.1,ff:0.14};
+function dynIx(d){var i=DYN_LEVELS.indexOf(d);return i<0?3:i;}
+function dynSizeF(d){return 0.8+0.08*dynIx(d);}   /* 0.80 … 1.20 */
+function dynOpacF(d){return 0.45+0.11*dynIx(d);}  /* 0.45 … 1.00 */
+function dynAlpha(midi,dyn){
+  return Math.min(1,brightness(midi)*dynOpacF(dyn)).toFixed(3);
+}
+
+/* ---------- chord renderer ----------
+   Every entity is a pitch SET (1–5 tones): stacked noteheads
+   sharing one stem. Adjacent tones (2nds/3rds) offset their
+   heads on alternating sides of the stem — standard notation.
+   style.brass    = brass fill/stroke (anchors: gold means "link")
+   style.tremolo  = 3 diagonal slashes through the stem       */
+function noteSVG(tones,flag,dyn,style){
+  style=style||{};
+  var f=dynSizeF(dyn);
+  var t=tones.slice().sort(function(a,b){return a-b;});
+  var avg=avgOf(t);
+  var s=headSize(avg)*f, rx=s/2, ry=s*0.37, stemH=s*2.7;
+  var span=t[t.length-1]-t[0];
+  var k=s*0.42;                                   /* px per semitone */
+  if(span>0 && span*k>stemH*0.9) k=stemH*0.9/span;
+  var cxL=rx+4;                                   /* left-side head centre */
+  var stemX=cxL+rx*0.9;
+  var sides=[], hasRight=false, i;
+  for(i=0;i<t.length;i++){
+    sides[i]=(i>0 && t[i]-t[i-1]<=3) ? !sides[i-1] : false;
+    if(sides[i]) hasRight=true;
+  }
+  var cy0=Math.ceil(stemH+span*k)+ry+4;           /* lowest head centre */
+  var cyTop=cy0-span*k;
+  var stemTop=cyTop-stemH;
+  var h=Math.ceil(cy0+ry+4);
+  var w=Math.ceil((hasRight?stemX+rx*0.95+rx:stemX+2)+4);
+  var stroke, fillFor;
+  if(style.brass){
+    stroke="rgba(180,131,76,0.9)";
+    fillFor=function(){return stroke;};
+  }else{
+    stroke="rgba("+PAPER+","+dynAlpha(avg,dyn)+")";
+    fillFor=function(m){return "rgba("+PAPER+","+dynAlpha(m,dyn)+")";};
+  }
+  var parts=[];
+  parts.push('<line x1="'+stemX.toFixed(1)+'" y1="'+stemTop.toFixed(1)+
+    '" x2="'+stemX.toFixed(1)+'" y2="'+(cy0-1).toFixed(1)+
+    '" stroke="'+stroke+'" stroke-width="1.4"/>');
+  if(flag){
+    parts.push('<path d="M '+stemX.toFixed(1)+' '+stemTop.toFixed(1)+
+      ' C '+(stemX+rx*1.9).toFixed(1)+' '+(stemTop+stemH*0.12).toFixed(1)+
+      ' '+(stemX+rx*1.7).toFixed(1)+' '+(stemTop+stemH*0.42).toFixed(1)+
+      ' '+(stemX+rx*0.35).toFixed(1)+' '+(stemTop+stemH*0.62).toFixed(1)+
+      '" fill="none" stroke="'+stroke+'" stroke-width="1.6" stroke-linecap="round"/>');
+  }
+  if(style.tremolo){
+    var yc=stemTop+stemH*0.34;
+    for(i=0;i<3;i++){
+      var yy=yc+i*(ry*1.1+3.5);
+      parts.push('<line x1="'+(stemX-rx*1.15).toFixed(1)+'" y1="'+(yy+3.4).toFixed(1)+
+        '" x2="'+(stemX+rx*1.15).toFixed(1)+'" y2="'+(yy-3.4).toFixed(1)+
+        '" stroke="'+stroke+'" stroke-width="2.1" stroke-linecap="round"/>');
+    }
+  }
+  for(i=0;i<t.length;i++){
+    var cxh=sides[i]?stemX+rx*0.95:cxL;
+    var cyh=cy0-(t[i]-t[0])*k;
+    parts.push('<ellipse cx="'+cxh.toFixed(1)+'" cy="'+cyh.toFixed(1)+'" rx="'+rx.toFixed(1)+
+      '" ry="'+ry.toFixed(1)+'" transform="rotate(-20 '+cxh.toFixed(1)+' '+cyh.toFixed(1)+
+      ')" fill="'+fillFor(t[i])+'"/>');
+  }
+  return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'">'+parts.join("")+'</svg>';
+}
+
+/* ---------- operators ----------
+   Two abstract families, no scalars, no self-mutation — an
+   operator's glyph is fixed at spawn forever:
+     DYNAMICS   (oxblue, italic serif): pp mp mf f —
+                set the entity's loudness state (gain + visual weight)
+     STRUCTURAL (tobacco): Σ fuse the nearest single-or-smaller
+                entity into the set, ∏ split a chord in two /
+                ascend a single tone, ∮ cycle the whole set up
+                one scale degree.                               */
+var OP_DEFS=[
+  {fam:"dyn",    level:"pp", label:"pp"},
+  {fam:"dyn",    level:"mp", label:"mp"},
+  {fam:"dyn",    level:"mf", label:"mf"},
+  {fam:"dyn",    level:"f",  label:"f"},
+  {fam:"struct", sym:"Σ",    label:"Σ"},
+  {fam:"struct", sym:"∏",    label:"∏"},
+  {fam:"struct", sym:"∮",    label:"∮"}
+];
+
+/* wrap a midi value inside the spawn range */
+function wrapRange(m){
+  var span=NOTE_MAX-NOTE_MIN+1;
+  return NOTE_MIN+(((m-NOTE_MIN)%span)+span)%span;
+}
+
+/* ∮ — one scale degree upward, cyclically: chromatic steps a semitone,
+   scales step to the next scale tone; wraps at the range top back to
+   the bottom. Off-scale pitches are snapped first, then advanced. */
+function nextDegreeUp(midi){
+  var tones=SCALES[settings.scale]||SCALES.chromatic;
+  var base=midi, pc=((base%12)+12)%12;
+  if(tones.indexOf(pc)<0){ base=snapToScale(midi); pc=((base%12)+12)%12; }
+  var next=-1, i;
+  for(i=0;i<tones.length;i++){ if(tones[i]>pc){ next=tones[i]; break; } }
+  var cand=(next>=0) ? base-pc+next : base-pc+tones[0]+12;
+  if(cand>NOTE_MAX) cand=snapToScale(wrapRange(cand));
+  return cand;
+}
+
+/* ∏ on a single tone — ascend to the next harmonic tone (a fifth up,
+   snapped to the scale), wrapping inside the range. */
+function piAscend(midi){
+  var cand=snapToScale(midi+7);
+  if(cand>NOTE_MAX) cand=snapToScale(wrapRange(midi+7));
+  if(cand===midi) cand=snapToScale(wrapRange(midi+12));
+  return cand;
+}
+
+/* ---------- entities ---------- */
+var notes=[], anchors=[], operators=[], simT=0, W=0, H=0, UID=1;
+var transformCount=0, transformResults=[];
+
+function makeEntity(cls,tag){
+  var el=document.createElement(tag||"div");
+  el.className="ent "+cls;
+  stage.appendChild(el);
+  return el;
+}
+
+function restyleNote(n){
+  n.el.innerHTML='<div class="inner note">'+
+    noteSVG(n.tones,n.flag,n.dyn,{brass:n.brass,tremolo:n.tremolo})+"</div>"+(n.anchorHTML||"");
+  n.r=headSize(avgOf(n.tones))*dynSizeF(n.dyn)*0.864*(1+0.1*(n.tones.length-1)); /* collision radius (+20% reach) */
+  var b=n.el.firstChild.getBoundingClientRect();   /* visual bounds for walls */
+  n.rv=Math.max(b.width,b.height)/2+2;
+  if(n.anchor){                                    /* label sits below the chord */
+    var lab=n.el.querySelector(".alabel");
+    if(lab) lab.style.top="calc(50% + "+Math.round(n.rv+5)+"px)";
+  }
+}
+
+function spawnNote(fade){
+  var el=makeEntity("note");
+  var midi=NOTE_MIN+Math.floor(rand(0,NOTE_MAX-NOTE_MIN+1));
+  var sp=rand(28,64), ang=rand(0,Math.PI*2);
+  var n={el:el, id:UID++, tones:[midi], flag:Math.random()<0.45, dyn:"mf",
+         x:rand(60,W-60), y:rand(80,H-80),
+         vx:0, vy:0,
+         cool:{}, r:18, pace:rand(0.5,1.5)};   /* stable personal pace */
+  n.baseSp=sp;
+  var ts=targetSpeed(n)||30;                  /* spawn AT cruise speed — no ramp */
+  n.vx=Math.cos(ang)*ts; n.vy=Math.sin(ang)*ts;
+  place(n);                                   /* born AT its spot — never at (0,0) */
+  restyleNote(n);
+  if(fade){
+    el.style.transition="opacity .7s ease";
+    el.style.opacity="0";
+    requestAnimationFrame(function(){requestAnimationFrame(function(){el.style.opacity="1";});});
+  }
+  notes.push(n);
+  return n;
+}
+
+/* spawn a field entity with a given pitch set / position / heading
+   (used when ∏ divides a chord) */
+function spawnSet(tones,x,y,ang,dyn){
+  var el=makeEntity("note");
+  var n={el:el, id:UID++, tones:tones.slice().sort(function(a,b){return a-b;}),
+         flag:Math.random()<0.45, dyn:dyn||"mf",
+         x:Math.min(Math.max(x,40),Math.max(40,W-40)),
+         y:Math.min(Math.max(y,60),Math.max(60,H-60)),
+         vx:0, vy:0, cool:{}, r:18, pace:rand(0.5,1.5)};
+  n.baseSp=rand(28,64);
+  var ts=targetSpeed(n)||30;
+  n.vx=Math.cos(ang)*ts; n.vy=Math.sin(ang)*ts;
+  for(var k=0;k<operators.length;k++) n.cool[k]=simT+1.0;
+  place(n);                                   /* born AT its spot — never at (0,0) */
+  restyleNote(n);
+  notes.push(n);
+  return n;
+}
+
+/* ---------- anchors: musical objects, immune to everything ----------
+   ALL anchors wear brass — gold is the field's way of saying "link".
+   Each is still distinguished by its nature, not a ring:
+     writing = a four-tone chord        worlds  = a triad
+     scholar = a close two-tone third   tech    = two tones an octave apart
+     sound   = a tone with tremolo      contact = a single high tone
+   Voicings are snapped to the scale at spawn. Anchors glide at a
+   fixed stately pace (~0.3× base, outside the field's pace range)
+   and spawn ALREADY at cruise velocity, spread across the viewport
+   by deterministic REGION ownership: each anchor owns a fixed
+   fractional slot, with small jitter, ≥8% edge margins, and a hard
+   floor of ≥30% of the smaller viewport dimension between pairs.  */
+var ANCHOR_SETS={
+  writing:[57,60,64,67],     /* four-tone chord */
+  tech:[57,69],              /* two tones, one octave apart */
+  sound:[66],                /* single tone + tremolo slashes */
+  scholar:[60,64],           /* two-tone interval: a third */
+  worlds:[60,64,67],         /* major triad */
+  contact:[74]               /* a single high tone */
+};
+/* Region ownership: each anchor owns a fixed fractional slot, so the
+   whole field is covered deterministically on every load — no sampling
+   luck involved. Landscape slots cover all four quadrants plus top and
+   lower centre; portrait slots ladder down the page in three columns.
+   Raw slot layouts hold ≥34% of min-dim pairwise separation even on a
+   square viewport.                                        */
+var ANCHOR_SLOTS_LANDSCAPE=[[0.16,0.22],[0.84,0.20],[0.50,0.15],[0.20,0.82],[0.80,0.84],[0.50,0.64]];
+var ANCHOR_SLOTS_PORTRAIT =[[0.20,0.12],[0.80,0.22],[0.50,0.40],[0.20,0.56],[0.80,0.68],[0.50,0.88]];
+var ANCHOR_JITTER=0.035;     /* ±3.5% of the viewport per axis */
+var ANCHOR_MIN_SEP=0.30;     /* × min(W,H) — hard floor between pairs */
+var ANCHOR_PACE=0.3;         /* fixed slow glide, regardless of field pace */
+function minPairDist(pts){
+  var m=Infinity;
+  for(var i=0;i<pts.length;i++)for(var j=i+1;j<pts.length;j++){
+    var dx=pts[i][0]-pts[j][0], dy=pts[i][1]-pts[j][1];
+    var d=Math.sqrt(dx*dx+dy*dy);
+    if(d<m)m=d;
+  }
+  return m;
+}
+function anchorSpots(){
+  var slots=(W>=H?ANCHOR_SLOTS_LANDSCAPE:ANCHOR_SLOTS_PORTRAIT);
+  var minDim=Math.min(W,H), need=minDim*ANCHOR_MIN_SEP;
+  var mx=W*0.08, my=H*0.08;                      /* ≥8% edge margins */
+  var out=[], scale=1, attempt;
+  for(attempt=0;attempt<4;attempt++){
+    out=[];
+    var j=ANCHOR_JITTER*scale;
+    SITE.links.forEach(function(link,i){
+      var s=slots[i%slots.length];
+      var x=W*s[0]+rand(-j,j)*W, y=H*s[1]+rand(-j,j)*H;
+      x=Math.max(mx,Math.min(W-mx,x));
+      y=Math.max(my,Math.min(H-my,y));
+      out.push([x,y]);
+    });
+    if(out.length<2||minPairDist(out)>=need) break;
+    scale*=0.5;          /* shrink jitter; near-zero jitter always passes */
+  }
+  return out;
+}
+function spawnAnchors(){
+  var spots=anchorSpots();
+  SITE.links.forEach(function(link,i){
+    /* each anchor is a real <a>: click / Enter / middle-click /
+       cmd-click all navigate natively — no intermediary panel */
+    var el=makeEntity("anchor","a");
+    el.href=link.url;
+    if(/^https?:/i.test(link.url)){          /* externals open in a new tab */
+      el.target="_blank"; el.rel="noopener";
+    }
+    el.setAttribute("aria-label",link.label);
+    var sp=rand(16,30), ang=rand(0,Math.PI*2);
+    var spot=spots[i];
+    var set=ANCHOR_SETS[link.id]||[60+i*4];
+    var n={el:el, id:UID++, tones:snapSet(set), flag:i%2===0, anchor:true,
+           link:link, dyn:"mf",
+           brass:true, tremolo:link.id==="sound",
+           pace:ANCHOR_PACE,
+           x:spot[0], y:spot[1],
+           vx:0, vy:0,
+           cool:{}, r:18,
+           anchorHTML:'<div class="alabel">'+link.label+'</div>'};
+    n.baseSp=sp;
+    var ts=targetSpeed(n)||10;               /* spawn AT cruise speed — no ramp */
+    n.vx=Math.cos(ang)*ts; n.vy=Math.sin(ang)*ts;
+    place(n);                                /* slot position from the first paint */
+    restyleNote(n);
+    /* Space does not activate <a> natively — make it match Enter */
+    el.addEventListener("keydown",function(ev){
+      if(ev.key===" "){ev.preventDefault();el.click();}
+    });
+    /* hover/focus answers with a single brass ripple */
+    el.addEventListener("mouseenter",function(){flashRing(n.x,n.y,false);});
+    el.addEventListener("focus",function(){flashRing(n.x,n.y,false);});
+    notes.push(n);
+    anchors.push(n);
+  });
+}
+
+/* ---------- operators: stable citizens ---------- */
+function defFor(label){
+  for(var i=0;i<OP_DEFS.length;i++) if(OP_DEFS[i].label===label) return OP_DEFS[i];
+  return null;
+}
+function opByLabel(l){
+  for(var i=0;i<operators.length;i++) if(operators[i].label===l) return operators[i];
+  return null;
+}
+function spawnOperator(def,atEdge,fade){
+  var el=makeEntity("");
+  var fs=def.fam==="dyn"?rand(26,36):rand(30,42);
+  var glyph=document.createElement("div");
+  glyph.className="op "+def.fam;
+  glyph.style.fontSize=fs.toFixed(1)+"px";
+  glyph.textContent=def.label;
+  el.appendChild(glyph);
+  var b=glyph.getBoundingClientRect();
+  var sp=rand(11,26), ang=rand(0,Math.PI*2);
+  var x,y;
+  if(atEdge){
+    var side=Math.floor(rand(0,4));
+    if(side===0){ x=rand(80,Math.max(90,W-80)); y=44; }
+    else if(side===1){ x=W-52; y=rand(100,Math.max(110,H-100)); }
+    else if(side===2){ x=rand(80,Math.max(90,W-80)); y=H-52; }
+    else { x=52; y=rand(100,Math.max(110,H-100)); }
+  }else{
+    x=rand(80,Math.max(90,W-80)); y=rand(100,Math.max(110,H-100));
+  }
+  var o={el:el, def:def, label:def.label, glyph:glyph,
+         x:x, y:y,
+         vx:0, vy:0,
+         r:Math.max(b.width,b.height)/2*0.8,     /* collision radius */
+         rv:Math.max(b.width,b.height)/2+2,      /* visual bounds for walls */
+         pace:rand(0.5,1.5)};
+  o.baseSp=sp;
+  var ts=targetSpeed(o)||20;                  /* spawn AT cruise speed — no ramp */
+  o.vx=Math.cos(ang)*ts; o.vy=Math.sin(ang)*ts;
+  place(o);                                   /* born AT its spot — never at (0,0) */
+  operators.push(o);
+  if(fade){
+    el.style.transition="opacity 2s ease";
+    el.style.opacity="0";
+    requestAnimationFrame(function(){requestAnimationFrame(function(){el.style.opacity="1";});});
+    flashRing(x,y,true);                        /* one quiet ripple, no fanfare */
+  }
+  return o;
+}
+function spawnOperators(){
+  PROGRESSION.start.forEach(function(l){ spawnOperator(defFor(l),false,false); });
+  PROGRESSION.unlocks.forEach(function(u){
+    if(interactions>=u.at && !opByLabel(u.op)) spawnOperator(defFor(u.op),true,false);
+  });
+}
+function checkProgression(){
+  if(reduced) return;          /* reduced motion: progression stays frozen */
+  PROGRESSION.unlocks.forEach(function(u){
+    if(interactions>=u.at && !opByLabel(u.op)) spawnOperator(defFor(u.op),true,!reduced);
+  });
+}
+
+function place(e){
+  e.el.style.transform="translate3d("+e.x.toFixed(2)+"px,"+e.y.toFixed(2)+"px,0)";
+}
+function renderAll(){
+  notes.forEach(place);
+  operators.forEach(place);
+}
+
+/* ---------- density (live add/remove; anchors exempt) ---------- */
+function fieldNotes(){
+  return notes.filter(function(n){return !n.anchor && !n.dying;});
+}
+function adjustDensity(){
+  var cur=fieldNotes(), target=settings.density, i;
+  if(cur.length<target){
+    for(i=cur.length;i<target;i++) spawnNote(true);
+  }else if(cur.length>target){
+    var kill=cur.slice(target);
+    kill.forEach(function(n){
+      n.dying=true;
+      n.el.style.transition="opacity .7s ease";
+      n.el.style.opacity="0";
+      setTimeout(function(){
+        var ix=notes.indexOf(n);
+        if(ix>=0) notes.splice(ix,1);
+        n.el.remove();
+      },750);
+    });
+  }
+}
+
+/* ---------- effects: the brass ripple is the only feedback ---------- */
+function flashRing(x,y,dim){
+  var d=document.createElement("div");
+  d.className="ring"+(dim?" dim":"");
+  d.style.transform="translate(-50%,-50%)";
+  d.style.left=x+"px"; d.style.top=y+"px";
+  stage.appendChild(d);
+  setTimeout(function(){d.remove();},800);
+}
+
+/* ---------- sound (off by default): FM electric-piano voice ----------
+   Each tone of the set is a small FM voice, struck ~35ms apart,
+   low to high; bigger sets ring longer, gains stay ÷√n-normalised.
+   Voice: a sine CARRIER whose frequency is modulated by a sine
+   MODULATOR at exactly 2× the carrier frequency (2:1 — the classic
+   electric-piano pairing). The modulation INDEX decays exponentially
+   over the note: a bright attack that rounds off toward a pure sine
+   body. A faint second carrier partial at 2× (low gain) adds body.
+   Loudness states scale gain AND modulation index together: pp is a
+   nearly pure dark sine, ff has real FM bite. Master stays
+   conservative: a ff 5-tone chord peaks ≈0.37 (< 0.5).          */
+var actx=null, soundOn=false, lastArp=null, voiceLog=[];
+var DYN_INDEX={pp:0.35,p:0.6,mp:0.9,mf:1.3,f:1.8,ff:2.4};
+var VOICE={ratio:2, attack:0.030, indexFloor:0.12, indexDecayAt:0.7,
+           partialRatio:2, partialGain:0.18};
+function arpeggio(tones,gain,dyn){
+  var t=tones.slice().sort(function(a,b){return a-b;});
+  dyn=dyn||"mf";
+  var idx=DYN_INDEX[dyn]||DYN_INDEX.mf;
+  lastArp={tones:t, gain:gain, dyn:dyn, index:idx};
+  if(!soundOn||!actx) return;
+  var t0=actx.currentTime;
+  var dur=0.55+0.14*t.length;
+  var g0=Math.max(0.0002, gain/Math.sqrt(t.length));
+  var atk=VOICE.attack;
+  t.forEach(function(m,i){
+    var tt=t0+i*0.035;
+    var f=freqOf(m);
+    var fmod=f*VOICE.ratio;
+    var iPk=idx*fmod, iFl=idx*VOICE.indexFloor*fmod;
+    var env=actx.createGain();
+    env.gain.setValueAtTime(0.0001,tt);
+    env.gain.exponentialRampToValueAtTime(g0,tt+atk);                /* soft 30ms attack */
+    env.gain.exponentialRampToValueAtTime(0.0001,tt+dur);
+    var car=actx.createOscillator(); car.type="sine"; car.frequency.value=f;
+    var mod=actx.createOscillator(); mod.type="sine"; mod.frequency.value=fmod;
+    var mg=actx.createGain();
+    mg.gain.setValueAtTime(iPk,tt);                                    /* bright attack */
+    mg.gain.exponentialRampToValueAtTime(iFl,tt+dur*VOICE.indexDecayAt);/* → round body */
+    mod.connect(mg); mg.connect(car.frequency);
+    var par=actx.createOscillator(); par.type="sine"; par.frequency.value=f*VOICE.partialRatio;
+    var pg=actx.createGain(); pg.gain.value=VOICE.partialGain;
+    car.connect(env); par.connect(pg); pg.connect(env);
+    env.connect(actx.destination);
+    car.start(tt); car.stop(tt+dur+0.05);
+    mod.start(tt); mod.stop(tt+dur+0.05);
+    par.start(tt); par.stop(tt+dur+0.05);
+    voiceLog.push({midi:m, osc:["sine","sine"], ratio:VOICE.ratio,
+      carrierFreq:f, modFreq:fmod,
+      index:{peak:idx, floor:idx*VOICE.indexFloor,
+             modGainPeak:iPk, modGainFloor:iFl, decayAt:dur*VOICE.indexDecayAt},
+      partial:{type:"sine", freq:f*VOICE.partialRatio, gain:VOICE.partialGain},
+      attack:atk, decay:dur, gain:g0, dyn:dyn});
+    if(voiceLog.length>96) voiceLog.splice(0,voiceLog.length-96);
+  });
+}
+
+/* ---------- physics ----------
+   No Brownian jitter: each entity glides at its own stable pace
+   (assigned at spawn, never changes); temperature only scales the
+   global glide speed. Bounces preserve speed exactly, with at most
+   a ±3° angle nudge so trajectories never settle into perfect loops. */
+function targetSpeed(e){
+  return e.baseSp*(e.pace||1)*(settings.temperature/0.6);
+}
+function thermalize(e,dt){
+  var target=targetSpeed(e);
+  var sp=Math.hypot(e.vx,e.vy);
+  if(sp>0.0001){
+    var ns=sp+(target-sp)*Math.min(1,dt*3);        /* relax toward target */
+    e.vx*=ns/sp; e.vy*=ns/sp;
+  }else if(target>0){
+    var a=rand(0,Math.PI*2);
+    e.vx=Math.cos(a)*target; e.vy=Math.sin(a)*target;
+  }
+}
+function bounce(e,r){
+  var hit=false;
+  if(e.x<r){e.x=r;e.vx=Math.abs(e.vx);hit=true;}
+  else if(e.x>W-r){e.x=W-r;e.vx=-Math.abs(e.vx);hit=true;}
+  if(e.y<r){e.y=r;e.vy=Math.abs(e.vy);hit=true;}
+  else if(e.y>H-r){e.y=H-r;e.vy=-Math.abs(e.vy);hit=true;}
+  if(hit){ /* tiny angle nudge (≤3°), speed preserved exactly */
+    var sp=Math.hypot(e.vx,e.vy);
+    if(sp>0){
+      var a=rand(-3,3)*Math.PI/180, c=Math.cos(a), s=Math.sin(a);
+      var vx=e.vx*c-e.vy*s, vy=e.vx*s+e.vy*c;
+      e.vx=vx; e.vy=vy;
+    }
+  }
+}
+/* ---------- contact resolution ----------
+   One robust response for every solid pair, three rules:
+   1. POSITIONAL separation THIS frame: the overlap is pushed out along
+      the collision normal, split by inverse mass (invMass 0 = immovable,
+      used for anchors — they never move, the other body slides past).
+   2. APPROACH-ONLY impulses: a velocity change happens only while the
+      pair is closing (relative velocity · normal < 0). A separating
+      pair is left alone so it can part cleanly.
+   3. ONE impulse per ENCOUNTER: a pair re-arms only after ≥REARM_GAP
+      of separation (sim time — advances with the simulation itself,
+      so tab throttling cannot compress it).                      */
+var REARM_GAP=0.3;            /* sim-seconds of separation before re-arm */
+function pairNormal(a,b){
+  var dx=b.x-a.x, dy=b.y-a.y, d=Math.hypot(dx,dy);
+  var rr=a.r+b.r+2;
+  if(d>=rr) return null;
+  if(d<0.0001){ dx=1; dy=0; d=1; }
+  return {nx:dx/d, ny:dy/d, d:d, rr:rr};
+}
+function pushApart(a,b,invA,invB,g){
+  var corr=(g.rr-g.d)/(invA+invB);
+  a.x-=g.nx*corr*invA; a.y-=g.ny*corr*invA;
+  b.x+=g.nx*corr*invB; b.y+=g.ny*corr*invB;
+}
+function impulsePair(a,b,invA,invB,g,e){
+  var vn=(b.vx-a.vx)*g.nx+(b.vy-a.vy)*g.ny;
+  if(vn>=0) return false;                    /* already separating */
+  var J=-(1+e)*vn/(invA+invB);
+  a.vx-=J*invA*g.nx; a.vy-=J*invA*g.ny;
+  b.vx+=J*invB*g.nx; b.vy+=J*invB*g.ny;
+  return true;
+}
+
+/* instrumentation ring buffer (window.__demo.events) */
+var evLog=[];
+function logEv(k,o){
+  o.k=k; o.t=simT;
+  evLog.push(o);
+  if(evLog.length>400) evLog.splice(0,evLog.length-400);
+}
+
+function removeNote(m){
+  var ix=notes.indexOf(m);
+  if(ix>=0) notes.splice(ix,1);
+  m.el.remove();
+}
+
+/* DYNAMICS — set loudness state; a chord swells as one object */
+function applyDyn(n,o,cx,cy){
+  if(n.dyn===o.def.level){ flashRing(cx,cy,true); return false; }
+  n.dyn=o.def.level;
+  restyleNote(n);
+  flashRing(cx,cy,false);
+  arpeggio(n.tones,DYN_GAIN[n.dyn],n.dyn);
+  transformCount++;
+  transformResults.push(n.tones.slice());
+  bumpInteractions();
+  return true;
+}
+
+/* Σ — fuse the colliding entity with its nearest single-or-smaller
+   field entity (anchors exempt): sets union, capped (4, later 5).
+   Intervals grow into triads into chords over time. If the union
+   would exceed the cap, the contact is a quiet no-op deflect.   */
+function applySigma(n,o,cx,cy){
+  var maxD=Math.hypot(W,H)*0.35, best=null, bd=maxD, i;
+  for(i=0;i<notes.length;i++){
+    var m=notes[i];
+    if(m===n||m.anchor||m.dying) continue;
+    if(m.tones.length>n.tones.length) continue;      /* single-or-smaller */
+    var d=Math.hypot(m.x-n.x,m.y-n.y);
+    if(d<bd){bd=d;best=m;}
+  }
+  if(!best){ flashRing(cx,cy,true); return false; }
+  var union=n.tones.slice();
+  best.tones.forEach(function(m){ if(union.indexOf(m)<0) union.push(m); });
+  if(union.length>toneCap()){ flashRing(cx,cy,true); return false; }
+  n.tones=union.sort(function(a,b){return a-b;});
+  removeNote(best);                       /* the pair counts as one entity */
+  restyleNote(n);
+  flashRing(cx,cy,false);
+  arpeggio(n.tones,DYN_GAIN[n.dyn],n.dyn);
+  transformCount++;
+  transformResults.push(n.tones.slice());
+  bumpInteractions();
+  return true;
+}
+
+/* ∏ — split a chord of n≥2 tones into two entities, as evenly as
+   possible (4→2+2, 3→2+1, 5→3+2), parting at slight angles;
+   on a single tone, ascend to the next harmonic tone in the scale */
+function applyPi(n,o,cx,cy){
+  if(n.tones.length>=2){
+    var t=n.tones.slice().sort(function(a,b){return a-b;});
+    var keep=Math.ceil(t.length/2);
+    var rest=t.slice(keep);
+    n.tones=t.slice(0,keep);
+    var dyn=n.dyn;
+    var sp=Math.hypot(n.vx,n.vy)||targetSpeed(n)||30;
+    var base=Math.atan2(n.vy,n.vx);
+    n.vx=Math.cos(base-0.14)*sp; n.vy=Math.sin(base-0.14)*sp;
+    spawnSet(rest,n.x,n.y,base+0.14,dyn);
+    restyleNote(n);
+    flashRing(cx,cy,false);
+    arpeggio(n.tones,DYN_GAIN[n.dyn],n.dyn);
+    arpeggio(rest,DYN_GAIN[dyn],dyn);
+    transformCount++;
+    transformResults.push(n.tones.slice());
+    bumpInteractions();
+    return true;
+  }
+  var before=n.tones[0], nm=piAscend(before);
+  if(nm===before){ flashRing(cx,cy,true); return false; }
+  n.tones=[nm];
+  restyleNote(n);
+  flashRing(cx,cy,false);
+  arpeggio(n.tones,DYN_GAIN[n.dyn],n.dyn);
+  transformCount++;
+  transformResults.push(n.tones.slice());
+  bumpInteractions();
+  return true;
+}
+
+/* ∮ — advance the ENTIRE set one scale degree upward (wraps per-tone) */
+function applyCycle(n,o,cx,cy){
+  var set=[];
+  n.tones.forEach(function(m){
+    var nm=nextDegreeUp(m);
+    if(set.indexOf(nm)<0) set.push(nm);
+  });
+  n.tones=set.sort(function(a,b){return a-b;});
+  restyleNote(n);
+  flashRing(cx,cy,false);
+  arpeggio(n.tones,DYN_GAIN[n.dyn],n.dyn);
+  transformCount++;
+  transformResults.push(n.tones.slice());
+  bumpInteractions();
+  return true;
+}
+
+function applyOperator(n,o){
+  var cx=(n.x+o.x)/2, cy=(n.y+o.y)/2;
+  if(o.def.fam==="dyn") return applyDyn(n,o,cx,cy);
+  if(o.def.sym==="Σ") return applySigma(n,o,cx,cy);
+  if(o.def.sym==="∏") return applyPi(n,o,cx,cy);
+  return applyCycle(n,o,cx,cy);
+}
+
+function collide(){
+  for(var i=0;i<notes.length;i++){
+    var n=notes[i];
+    if(n.dying) continue;
+    for(var j=0;j<operators.length;j++){
+      var o=operators[j];
+      var g=pairNormal(n,o);
+      if(!g) continue;
+      if(n.anchor){
+        /* anchors are immovable: NO deflect, no velocity change — the
+           operator is simply position-corrected out of the anchor's
+           disc and glides on with its heading untouched */
+        pushApart(n,o,0,1,g);
+        continue;
+      }
+      pushApart(n,o,1,3,g);                    /* overlap resolved THIS frame;
+                                                  the operator takes most of it */
+      /* one gentle deflect per encounter; re-arm after ≥REARM_GAP apart */
+      n.enc=n.enc||{};
+      var last=(n.enc[j]===undefined)?-1e9:n.enc[j];
+      var fresh=(simT-last)>=REARM_GAP;
+      n.enc[j]=simT;
+      if(fresh){
+        /* redirect the note away along the collision normal — ONCE, with
+           speed preserved — and only if it is actually moving INTO the
+           operator (approach-only: a pair already parting is left alone) */
+        var vnN=(n.vx-o.vx)*g.nx+(n.vy-o.vy)*g.ny;
+        if(vnN>0){
+          var sp=Math.hypot(n.vx,n.vy)||targetSpeed(n)||30;
+          n.vx=-g.nx*sp; n.vy=-g.ny*sp;
+          logEv("deflect-op",{n:n.id,o:j});
+        }
+      }
+      if((n.cool[j]||0)>simT) continue;        /* transform cooldown gates the hit */
+      n.cool[j]=simT+0.8;
+      if(Math.random()<settings.reactivity){
+        if(applyOperator(n,o)) logEv("transform",{op:o.label,n:n.id});
+      }
+      /* stochastic pass-through: the single deflect above is all */
+    }
+  }
+}
+
+/* chord–chord contact: entities with ≥2 tones soft-bounce off each
+   other (single tones pass through). Overlap is resolved THIS frame
+   (equal masses split the correction); the soft impulse is approach-
+   only and fires at most ONCE per encounter — the pair re-arms only
+   after ≥REARM_GAP of separation, so a chase cannot machine-gun
+   impulses against the thermalize relaxation. Both quietly replay
+   their arpeggio at ~40% gain — resonance without narration.     */
+function chordBounce(){
+  var cs=[], i, j;
+  for(i=0;i<notes.length;i++){
+    var n=notes[i];
+    if(!n.anchor && !n.dying && n.tones.length>=2) cs.push(n);
+  }
+  for(i=0;i<cs.length;i++){
+    for(j=i+1;j<cs.length;j++){
+      var a=cs[i], b=cs[j];
+      var g=pairNormal(a,b);
+      if(!g) continue;
+      pushApart(a,b,1,1,g);
+      a.bCool=a.bCool||{}; b.bCool=b.bCool||{};
+      var last=(a.bCool[b.id]===undefined)?-1e9:a.bCool[b.id];
+      var fresh=(simT-last)>=REARM_GAP;
+      a.bCool[b.id]=simT; b.bCool[a.id]=simT;
+      if(!fresh) continue;
+      if(impulsePair(a,b,1,1,g,0.85)){
+        logEv("impulse-chord",{a:a.id,b:b.id});
+        arpeggio(a.tones,DYN_GAIN[a.dyn]*0.4,a.dyn);
+        arpeggio(b.tones,DYN_GAIN[b.dyn]*0.4,b.dyn);
+      }
+    }
+  }
+}
+
+function frame(dt){
+  simT+=dt;
+  var i,e;
+  for(i=0;i<notes.length;i++){
+    e=notes[i];
+    if(e.dying) continue;
+    thermalize(e,dt);
+    e.x+=e.vx*dt; e.y+=e.vy*dt;
+    bounce(e,e.rv||e.r);
+  }
+  for(i=0;i<operators.length;i++){
+    e=operators[i];
+    thermalize(e,dt);
+    e.x+=e.vx*dt; e.y+=e.vy*dt;
+    bounce(e,e.rv||e.r);
+  }
+  collide();
+  chordBounce();
+}
+
+/* ---------- boot ----------
+   The viewport is read at the MOMENT entities spawn — never earlier.
+   Inside preview iframes / srcdoc / about:blank races, innerWidth and
+   innerHeight can be zero or tiny at script time; spawning then would
+   pile every entity within a few px of the top-left corner. If the
+   viewport is not yet sane (≥320×320), spawning is deferred and polled
+   on rAF + resize for up to ~2s, after which whatever exists is
+   accepted. */
+var VIEW_MIN=320;
+var booted=false, bootAspect=null, bootDeadline=0, bootPolling=false;
+function readViewport(){ W=window.innerWidth; H=window.innerHeight; }
+function viewportSane(){ return W>=VIEW_MIN && H>=VIEW_MIN; }
+function aspectClass(){ return W>=H ? "landscape" : "portrait"; }
+function spawnAll(){
+  readViewport();                       /* re-read AT spawn time */
+  booted=true;
+  bootAspect=aspectClass();
+  for(var i=0;i<settings.density;i++) spawnNote(false);
+  spawnAnchors();
+  spawnOperators();
+  renderAll();
+}
+function tryBoot(){
+  if(booted) return;
+  readViewport();
+  if(viewportSane() || performance.now()>=bootDeadline){ spawnAll(); return; }
+  if(!bootPolling){
+    bootPolling=true;
+    requestAnimationFrame(function(){ bootPolling=false; tryBoot(); });
+  }
+}
+
+/* ---------- resize re-fit ----------
+   Debounced (~150ms): after the viewport settles, re-read W/H and pull
+   every entity (notes, chords, operators, anchors) back inside the
+   visible field with margins. Velocity direction is preserved — only
+   positions move. If the aspect class flipped (landscape↔portrait),
+   anchors additionally re-home to their slot layout for the new
+   orientation. Nothing lives outside the field after a resize. */
+var resizeTimer=0;
+function refit(){
+  readViewport();
+  if(booted){
+    var asp=aspectClass();
+    if(asp!==bootAspect){
+      bootAspect=asp;
+      var spots=anchorSpots();
+      anchors.forEach(function(a,i){
+        a.x=spots[i%spots.length][0];
+        a.y=spots[i%spots.length][1];
+      });
+    }
+  }
+  notes.concat(operators).forEach(function(e){
+    var r=e.rv||e.r;
+    e.x=Math.min(Math.max(e.x,r),Math.max(r,W-r));
+    e.y=Math.min(Math.max(e.y,r),Math.max(r,H-r));
+  });
+  renderAll();
+}
+function onResize(){
+  if(!booted){ tryBoot(); return; }    /* may be the first sane viewport */
+  clearTimeout(resizeTimer);
+  resizeTimer=setTimeout(refit,150);
+}
+
+document.getElementById("mark").textContent=SITE.name;
+
+function init(){
+  bootDeadline=performance.now()+2000;
+  tryBoot();
+}
+init();
+window.addEventListener("resize",onResize);
+window.addEventListener("orientationchange",onResize);
+
+/* ---------- main loop ---------- */
+var running=false, paused=false, lastT=0, rafId=0;
+function loop(t){
+  if(!running) return;
+  rafId=requestAnimationFrame(loop);
+  var dt=Math.min(0.05,(t-lastT)/1000); lastT=t;
+  frame(dt);
+  renderAll();
+}
+function start(){
+  if(running||reduced||paused||document.hidden) return;
+  running=true; lastT=performance.now();
+  rafId=requestAnimationFrame(loop);
+}
+function stop(){
+  running=false;
+  if(rafId) cancelAnimationFrame(rafId);
+}
+
+if(!reduced) start();
+
+document.addEventListener("visibilitychange",function(){
+  if(document.hidden) stop(); else start();
+});
+
+/* ---------- controls ---------- */
+var btnPause=document.getElementById("btn-pause");
+var btnSound=document.getElementById("btn-sound");
+var btnDyn=document.getElementById("btn-dyn");
+var drawer=document.getElementById("drawer");
+btnPause.addEventListener("click",function(){
+  paused=!paused;
+  btnPause.textContent=paused?"play":"pause";
+  btnPause.classList.toggle("on",paused);
+  btnPause.setAttribute("aria-pressed",String(paused));
+  if(paused) stop(); else start();
+});
+btnSound.addEventListener("click",function(){
+  soundOn=!soundOn;
+  btnSound.classList.toggle("on",soundOn);
+  btnSound.setAttribute("aria-pressed",String(soundOn));
+  if(soundOn&&!actx){
+    try{ actx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ actx=null; }
+  }
+  if(actx&&actx.state==="suspended") actx.resume();
+});
+btnDyn.addEventListener("click",function(){
+  var open=drawer.hidden;
+  drawer.hidden=!open;
+  btnDyn.setAttribute("aria-expanded",String(open));
+});
+
+/* drawer wiring */
+var els={
+  temperature:[document.getElementById("s-temp"),document.getElementById("v-temp")],
+  reactivity:[document.getElementById("s-react"),document.getElementById("v-react")],
+  density:[document.getElementById("s-dens"),document.getElementById("v-dens")]
+};
+var selScale=document.getElementById("s-scale");
+function fmtVal(key){
+  return key==="density" ? String(settings.density) : Number(settings[key]).toFixed(2);
+}
+function syncDrawer(){
+  for(var k in els){
+    els[k][0].value=settings[k];
+    els[k][1].textContent=fmtVal(k);
+  }
+  selScale.value=settings.scale;
+}
+function applySettings(){
+  adjustDensity();
+  saveSettings();
+}
+for(var key in els)(function(k){
+  els[k][0].addEventListener("input",function(){
+    settings[k]= k==="density" ? parseInt(this.value,10) : parseFloat(this.value);
+    els[k][1].textContent=fmtVal(k);
+    applySettings();
+  });
+})(key);
+selScale.addEventListener("change",function(){
+  settings.scale=this.value;
+  applySettings();
+});
+syncDrawer();
+
+/* window.__demo: inert inspection/tuning hook — no UI, safe to ignore */
+window.__demo={
+  notes:notes, operators:operators, anchors:anchors,
+  settings:settings, progression:PROGRESSION,
+  setSettings:function(patch){
+    for(var k in patch) settings[k]=patch[k];
+    syncDrawer();
+    applySettings();
+  },
+  step:function(dt){ frame(dt||1/60); renderAll(); },
+  nameOf:nameOf, snapToScale:snapToScale, snapSet:snapSet,
+  nextDegreeUp:nextDegreeUp, piAscend:piAscend,
+  dynGain:function(l){return DYN_GAIN[l];},
+  dynIndex:function(l){return DYN_INDEX[l];},
+  lastArp:function(){return lastArp;},
+  lastPluck:function(){return lastArp;},
+  voices:function(){return voiceLog.slice();},
+  clearVoices:function(){voiceLog.length=0;},
+  soundOn:function(){return soundOn;},
+  setSound:function(on){ if(!!on!==soundOn) btnSound.click(); },
+  voiceParams:function(){var v={};for(var k in VOICE)v[k]=VOICE[k];return v;},
+  toneCap:toneCap,
+  interactions:function(){return interactions;},
+  setInteractions:function(v,apply){
+    interactions=Math.max(0,Math.floor(v)||0);
+    try{ localStorage.setItem(LS_PROG,String(interactions)); }catch(e){}
+    if(apply!==false) checkProgression();
+  },
+  opByLabel:opByLabel,
+  spawnSet:spawnSet,
+  collideNow:function(){collide();},
+  chordBounceNow:function(){chordBounce();},
+  restyle:restyleNote,
+  meanSpeed:function(){
+    var ns=fieldNotes(), s=0;
+    ns.forEach(function(n){s+=Math.hypot(n.vx,n.vy);});
+    return ns.length?s/ns.length:0;
+  },
+  booted:function(){return booted;},
+  dims:function(){return [W,H];},
+  events:function(){return evLog.slice();},
+  clearEvents:function(){evLog.length=0;},
+  transforms:function(){return transformCount;},
+  results:transformResults,
+  fieldCount:function(){return fieldNotes().length;},
+  forceCollisions:function(k){
+    var made=0;
+    for(var i=0;i<k;i++){
+      var ns=fieldNotes();
+      if(!ns.length||!operators.length) break;
+      var n=ns[i%ns.length], o=operators[i%operators.length];
+      n.x=o.x; n.y=o.y; n.cool={};
+      collide();
+      made++;
+    }
+    renderAll();
+    return made;
+  }
+};
+})();
+</script>
+</body>
 </html>
