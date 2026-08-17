@@ -78,7 +78,7 @@ main{
   min-height:100vh;
   display:flex;align-items:center;justify-content:center;
   gap:clamp(72px,11vw,190px);
-  padding:15vh 6vw 10vh;
+  padding:11vh 6vw 9vh;
 }
 .rot{margin:0}
 .rot h2{
@@ -90,13 +90,15 @@ main{
 }
 .names{list-style:none;margin:0;padding:0}
 .n{
+  display:block;
   position:relative;
   font-family:var(--serif);
-  font-size:clamp(32px,min(3.4vw,4.8vh),52px);
+  font-size:clamp(26px,min(2.9vw,3.9vh),46px);
   line-height:1.18;
-  padding:.3em 0 .3em 1.1em;
+  padding:.26em 0 .26em 1.1em;
   color:rgba(237,231,219,.66);
-  cursor:default;outline:none;
+  text-decoration:none;
+  cursor:pointer;outline:none;
   transition:opacity 160ms var(--ease),color 160ms var(--ease);
 }
 
@@ -160,21 +162,27 @@ main{
   <section class="rot" aria-labelledby="h-books">
     <h2 id="h-books">my book rotation</h2>
     <ol class="names">
-      <li class="n" tabindex="0">Karl Ove Knausgaard</li>
-      <li class="n" tabindex="0">Paul Auster</li>
-      <li class="n" tabindex="0">Ellen Ullman</li>
-      <li class="n" tabindex="0">Gustave Flaubert</li>
-      <li class="n" tabindex="0">Haruki Murakami</li>
+      <li><a class="n" href="https://en.wikipedia.org/wiki/Karl_Ove_Knausg%C3%A5rd" target="_blank" rel="noopener">Karl Ove Knausgaard</a></li>
+      <li><a class="n" href="https://en.wikipedia.org/wiki/Paul_Auster" target="_blank" rel="noopener">Paul Auster</a></li>
+      <li><a class="n" href="https://en.wikipedia.org/wiki/Ellen_Ullman" target="_blank" rel="noopener">Ellen Ullman</a></li>
+      <li><a class="n" href="https://en.wikipedia.org/wiki/Gustave_Flaubert" target="_blank" rel="noopener">Gustave Flaubert</a></li>
+      <li><a class="n" href="https://en.wikipedia.org/wiki/Haruki_Murakami" target="_blank" rel="noopener">Haruki Murakami</a></li>
+      <li><a class="n" href="https://en.wikipedia.org/wiki/Kazuo_Ishiguro" target="_blank" rel="noopener">Kazuo Ishiguro</a></li>
+      <li><a class="n" href="https://en.wikipedia.org/wiki/Elena_Ferrante" target="_blank" rel="noopener">Elena Ferrante</a></li>
+      <li><a class="n" href="https://en.wikipedia.org/wiki/Milan_Kundera" target="_blank" rel="noopener">Milan Kundera</a></li>
     </ol>
   </section>
   <section class="rot" aria-labelledby="h-music">
     <h2 id="h-music">my music rotation</h2>
     <ol class="names">
-      <li class="n m" tabindex="0">Hania Rani</li>
-      <li class="n m" tabindex="0">Nils Frahm</li>
-      <li class="n m" tabindex="0">Nicolas Jaar</li>
-      <li class="n m" tabindex="0">Odesza</li>
-      <li class="n m" tabindex="0">Bob Moses</li>
+      <li><a class="n m" href="https://en.wikipedia.org/wiki/Hania_Rani" target="_blank" rel="noopener">Hania Rani</a></li>
+      <li><a class="n m" href="https://en.wikipedia.org/wiki/Nils_Frahm" target="_blank" rel="noopener">Nils Frahm</a></li>
+      <li><a class="n m" href="https://en.wikipedia.org/wiki/Nicolas_Jaar" target="_blank" rel="noopener">Nicolas Jaar</a></li>
+      <li><a class="n m" href="https://en.wikipedia.org/wiki/Odesza" target="_blank" rel="noopener">Odesza</a></li>
+      <li><a class="n m" href="https://en.wikipedia.org/wiki/Bob_Moses_(band)" target="_blank" rel="noopener">Bob Moses</a></li>
+      <li><a class="n m" href="https://en.wikipedia.org/wiki/Parra_for_Cuva" target="_blank" rel="noopener">Parra for Cuva</a></li>
+      <!-- no English article for the musician; en.wikipedia "Thylacine" is the marsupial -->
+      <li><a class="n m" href="https://fr.wikipedia.org/wiki/Thylacine_(musicien)" target="_blank" rel="noopener" hreflang="fr">Thylacine</a></li>
     </ol>
   </section>
 </main>
