@@ -187,6 +187,25 @@ body{
       <option value="dorian">dorian</option>
     </select>
   </div>
+  <div class="row">
+    <label for="s-motion">motion</label>
+    <select id="s-motion">
+      <option value="glide">glide</option>
+      <option value="brownian">brownian</option>
+      <option value="orbital">orbital</option>
+      <option value="harmonic">harmonic</option>
+      <option value="flocking">flocking</option>
+      <option value="levy">lévy flight</option>
+    </select>
+  </div>
+  <div class="row">
+    <label for="s-inst">instrument</label>
+    <select id="s-inst">
+      <option value="piano">electric piano</option>
+      <option value="synth">synth</option>
+      <option value="saxophone">saxophone</option>
+    </select>
+  </div>
 </div>
 
 <script>
@@ -247,7 +266,8 @@ function freqOf(m){return 440*Math.pow(2,(m-69)/12);}
 
 /* ---------- dynamics settings (persisted) ---------- */
 var LS_KEY="site-dynamics-v2";
-var DEFAULTS={temperature:1.0, reactivity:1.0, density:18, scale:"chromatic"};
+var DEFAULTS={temperature:1.0, reactivity:1.0, density:18, scale:"chromatic",
+              motion:"glide", instrument:"piano"};
 var SCALES={
   "chromatic":[0,1,2,3,4,5,6,7,8,9,10,11],
   "minor pentatonic":[0,3,5,7,10],
@@ -255,6 +275,37 @@ var SCALES={
   "whole-tone":[0,2,4,6,8,10],
   "dorian":[0,2,3,5,7,9,10]
 };
+
+/* ---------- motion models ----------
+   Six laws of motion for the same field. `glide` is the original:
+   constant speed, direction changed only by walls and contacts. The
+   others each answer a different question about how a note should
+   wander. Temperature stays the single energy knob throughout — every
+   model reads targetSpeed(), so warming the field speeds all six.
+   Anchors are exempt: they are links first, and keep their stately
+   glide so they never become hard to catch.                         */
+var MOTIONS={
+  "glide":    {},   /* ballistic — constant velocity between bounces   */
+  "brownian": {},   /* Ornstein–Uhlenbeck — a true damped random walk  */
+  "orbital":  {},   /* Newtonian central gravity, softened at the core */
+  "harmonic": {},   /* each note springs about a home point (SHM)      */
+  "flocking": {},   /* boids — separation, alignment, cohesion         */
+  "levy":     {}    /* Lévy flight — Pareto runs, heavy-tailed turns   */
+};
+
+/* ---------- instruments ----------
+   Three voices over the same note events. Each maps the dynamic's
+   modulation index onto its own idea of brightness, so pp stays dark
+   and ff bites whichever is chosen. `gain` trims each voice to a
+   common loudness: a sawtooth carries far more energy than a sine.
+   `dur` and `stagger` carry the articulation — the piano is struck and
+   decays, the reed and the synth are blown and sustain.            */
+var INSTRUMENTS={
+  piano:    {gain:1.00, stagger:0.035, dur:function(n){return 0.55+0.14*n;}},
+  synth:    {gain:0.42, stagger:0.045, dur:function(n){return 0.80+0.16*n;}},
+  saxophone:{gain:0.36, stagger:0.055, dur:function(n){return 0.92+0.18*n;}}
+};
+
 var settings={};
 for(var k0 in DEFAULTS) settings[k0]=DEFAULTS[k0];
 try{
@@ -263,6 +314,8 @@ try{
     if(stored[k1]!==undefined) settings[k1]=stored[k1];
   }
   if(!SCALES[settings.scale]) settings.scale=DEFAULTS.scale;
+  if(!MOTIONS[settings.motion]) settings.motion=DEFAULTS.motion;
+  if(!INSTRUMENTS[settings.instrument]) settings.instrument=DEFAULTS.instrument;
 }catch(e){}
 function saveSettings(){
   try{ localStorage.setItem(LS_KEY,JSON.stringify(settings)); }catch(e){}
@@ -275,9 +328,16 @@ function saveSettings(){
 var LS_PROG="site-progression-v1";
 var interactions=0;
 try{ interactions=Math.max(0,parseInt(localStorage.getItem(LS_PROG)||"0",10)||0); }catch(e){}
+var progWrite=0;
 function bumpInteractions(){
   interactions++;
-  try{ localStorage.setItem(LS_PROG,String(interactions)); }catch(e){}
+  /* the count is exact in memory; the WRITE is coalesced. A dense field
+     under an active motion model can transform many times a second, and
+     localStorage.setItem is synchronous — writing each one janks. */
+  if(!progWrite) progWrite=setTimeout(function(){
+    progWrite=0;
+    try{ localStorage.setItem(LS_PROG,String(interactions)); }catch(e){}
+  },400);
   checkProgression();
 }
 function toneCap(){ return interactions>=PROGRESSION.cap5At ? 5 : PROGRESSION.chordCap; }
@@ -628,6 +688,7 @@ function spawnOperator(def,atEdge,fade){
     x=rand(80,Math.max(90,W-80)); y=rand(100,Math.max(110,H-100));
   }
   var o={el:el, def:def, label:def.label, glyph:glyph,
+         operator:true,                          /* keeps its glide in every model */
          x:x, y:y,
          vx:0, vy:0,
          r:Math.max(b.width,b.height)/2*0.8,     /* collision radius */
@@ -711,57 +772,156 @@ function flashRing(x,y,dim){
    Loudness states scale gain AND modulation index together: pp is a
    nearly pure dark sine, ff has real FM bite. Master stays
    conservative: a ff 5-tone chord peaks ≈0.37 (< 0.5).          */
-var actx=null, soundOn=false, lastArp=null, voiceLog=[];
+var actx=null, soundOn=false, lastArp=null, voiceLog=[], master=null;
 var DYN_INDEX={pp:0.35,p:0.6,mp:0.9,mf:1.3,f:1.8,ff:2.4};
 var VOICE={ratio:2, attack:0.030, indexFloor:0.12, indexDecayAt:0.7,
            partialRatio:2, partialGain:0.18};
+
+/* Every voice meets the same master chain: a modest gain into a gentle
+   compressor. The sustaining voices (synth, reed) overlap far more than
+   the struck piano does, and a dense field can fire several chords at
+   once — the compressor is what guarantees none of that ever clips. */
+function masterOut(){
+  if(!actx) return null;
+  if(!master){
+    master=actx.createGain(); master.gain.value=0.9;
+    var comp=actx.createDynamicsCompressor();
+    comp.threshold.value=-14; comp.knee.value=12; comp.ratio.value=4;
+    comp.attack.value=0.004; comp.release.value=0.18;
+    master.connect(comp); comp.connect(actx.destination);
+  }
+  return master;
+}
+
+/* ELECTRIC PIANO — a sine CARRIER frequency-modulated by a sine
+   MODULATOR at exactly 2x the carrier (the classic 2:1 pairing). The
+   modulation INDEX decays exponentially: a bright attack rounding off
+   toward a pure sine body. A faint partial at 2x adds weight. */
+function voicePiano(out,tt,f,dur,g0,idx){
+  var fmod=f*VOICE.ratio;
+  var iPk=idx*fmod, iFl=idx*VOICE.indexFloor*fmod;
+  var env=actx.createGain();
+  env.gain.setValueAtTime(0.0001,tt);
+  env.gain.exponentialRampToValueAtTime(g0,tt+VOICE.attack);        /* soft 30ms attack */
+  env.gain.exponentialRampToValueAtTime(0.0001,tt+dur);
+  var car=actx.createOscillator(); car.type="sine"; car.frequency.value=f;
+  var mod=actx.createOscillator(); mod.type="sine"; mod.frequency.value=fmod;
+  var mg=actx.createGain();
+  mg.gain.setValueAtTime(iPk,tt);                                     /* bright attack */
+  mg.gain.exponentialRampToValueAtTime(iFl,tt+dur*VOICE.indexDecayAt);/* -> round body */
+  mod.connect(mg); mg.connect(car.frequency);
+  var par=actx.createOscillator(); par.type="sine"; par.frequency.value=f*VOICE.partialRatio;
+  var pg=actx.createGain(); pg.gain.value=VOICE.partialGain;
+  car.connect(env); par.connect(pg); pg.connect(env);
+  env.connect(out);
+  car.start(tt); car.stop(tt+dur+0.05);
+  mod.start(tt); mod.stop(tt+dur+0.05);
+  par.start(tt); par.stop(tt+dur+0.05);
+  return {osc:["sine","sine"], ratio:VOICE.ratio,
+          carrierFreq:f, modFreq:fmod,
+          index:{peak:idx, floor:idx*VOICE.indexFloor,
+                 modGainPeak:iPk, modGainFloor:iFl, decayAt:dur*VOICE.indexDecayAt},
+          partial:{type:"sine", freq:f*VOICE.partialRatio, gain:VOICE.partialGain},
+          attack:VOICE.attack};
+}
+
+/* SYNTH — two sawtooths detuned a few cents against each other for
+   movement, a sine an octave below for floor, all through one resonant
+   lowpass that sweeps down over the note. The dynamic sets where the
+   sweep starts, so ff opens bright and pp stays closed. */
+function voiceSynth(out,tt,f,dur,g0,idx){
+  var atk=0.014, rel=dur*0.55;
+  var env=actx.createGain();
+  env.gain.setValueAtTime(0.0001,tt);
+  env.gain.exponentialRampToValueAtTime(g0,tt+atk);
+  env.gain.setValueAtTime(g0,tt+dur-rel);            /* hold, then release */
+  env.gain.exponentialRampToValueAtTime(0.0001,tt+dur);
+  var lp=actx.createBiquadFilter(); lp.type="lowpass"; lp.Q.value=6;
+  var top=Math.min(11000,f*(2.2+3.2*idx)), bot=Math.max(180,f*1.25);
+  lp.frequency.setValueAtTime(top,tt);
+  lp.frequency.exponentialRampToValueAtTime(bot,tt+dur*0.75);
+  var a=actx.createOscillator(); a.type="sawtooth"; a.frequency.value=f; a.detune.value=-7;
+  var b=actx.createOscillator(); b.type="sawtooth"; b.frequency.value=f; b.detune.value=7;
+  var sub=actx.createOscillator(); sub.type="sine"; sub.frequency.value=f/2;
+  var sg=actx.createGain(); sg.gain.value=0.25;
+  a.connect(lp); b.connect(lp); sub.connect(sg); sg.connect(lp);
+  lp.connect(env); env.connect(out);
+  [a,b,sub].forEach(function(o){ o.start(tt); o.stop(tt+dur+0.05); });
+  return {osc:["sawtooth","sawtooth","sine"], detune:7,
+          carrierFreq:f, sub:f/2,
+          filter:{type:"lowpass", from:top, to:bot, Q:6},
+          attack:atk};
+}
+
+/* SAXOPHONE — a sawtooth is already reed-like; what makes it read as a
+   horn is the rest: a slower breath attack, a peaking formant around
+   1.1kHz for the honk in the throat of the instrument, and a vibrato
+   that fades IN after the note speaks rather than sitting on it from
+   the start. */
+function voiceSax(out,tt,f,dur,g0,idx){
+  var atk=0.075, rel=dur*0.45;
+  var env=actx.createGain();
+  env.gain.setValueAtTime(0.0001,tt);
+  env.gain.exponentialRampToValueAtTime(g0,tt+atk);
+  env.gain.setValueAtTime(g0,tt+dur-rel);
+  env.gain.exponentialRampToValueAtTime(0.0001,tt+dur);
+  var lp=actx.createBiquadFilter(); lp.type="lowpass"; lp.Q.value=1.2;
+  var top=Math.min(9000,f*(3+4*idx)), bot=Math.max(400,f*2);
+  lp.frequency.setValueAtTime(top,tt);
+  lp.frequency.exponentialRampToValueAtTime(bot,tt+dur*0.8);
+  var fmt=actx.createBiquadFilter(); fmt.type="peaking";
+  fmt.frequency.value=1100; fmt.Q.value=1.4; fmt.gain.value=9;
+  var osc=actx.createOscillator(); osc.type="sawtooth"; osc.frequency.value=f;
+  var lfo=actx.createOscillator(); lfo.type="sine"; lfo.frequency.value=5.4;
+  var lg=actx.createGain();
+  lg.gain.setValueAtTime(0.0001,tt);                             /* vibrato fades in */
+  lg.gain.linearRampToValueAtTime(f*0.007,tt+Math.min(0.35,dur*0.5));
+  lfo.connect(lg); lg.connect(osc.frequency);
+  osc.connect(lp); lp.connect(fmt); fmt.connect(env); env.connect(out);
+  osc.start(tt); osc.stop(tt+dur+0.05);
+  lfo.start(tt); lfo.stop(tt+dur+0.05);
+  return {osc:["sawtooth"], carrierFreq:f,
+          filter:{type:"lowpass", from:top, to:bot, Q:1.2},
+          formant:{freq:1100, Q:1.4, gain:9},
+          vibrato:{rate:5.4, depth:f*0.007},
+          attack:atk};
+}
+
+var VOICE_FN={piano:voicePiano, synth:voiceSynth, saxophone:voiceSax};
+
+/* ---------- sound (off by default) ----------
+   Each tone of the set is one voice of the chosen instrument, struck
+   low to high a few tens of ms apart; bigger sets ring longer and gains
+   stay /sqrt(n)-normalised so a five-tone chord is no louder than a
+   single note. */
 function arpeggio(tones,gain,dyn){
   var t=tones.slice().sort(function(a,b){return a-b;});
   dyn=dyn||"mf";
   var idx=DYN_INDEX[dyn]||DYN_INDEX.mf;
-  lastArp={tones:t, gain:gain, dyn:dyn, index:idx};
+  var inst=INSTRUMENTS[settings.instrument]?settings.instrument:"piano";
+  var spec=INSTRUMENTS[inst], voice=VOICE_FN[inst]||voicePiano;
+  lastArp={tones:t, gain:gain, dyn:dyn, index:idx, instrument:inst};
   if(!soundOn||!actx) return;
+  var out=masterOut();
+  if(!out) return;
   var t0=actx.currentTime;
-  var dur=0.55+0.14*t.length;
-  var g0=Math.max(0.0002, gain/Math.sqrt(t.length));
-  var atk=VOICE.attack;
+  var dur=spec.dur(t.length);
+  var g0=Math.max(0.0002, gain*spec.gain/Math.sqrt(t.length));
   t.forEach(function(m,i){
-    var tt=t0+i*0.035;
-    var f=freqOf(m);
-    var fmod=f*VOICE.ratio;
-    var iPk=idx*fmod, iFl=idx*VOICE.indexFloor*fmod;
-    var env=actx.createGain();
-    env.gain.setValueAtTime(0.0001,tt);
-    env.gain.exponentialRampToValueAtTime(g0,tt+atk);                /* soft 30ms attack */
-    env.gain.exponentialRampToValueAtTime(0.0001,tt+dur);
-    var car=actx.createOscillator(); car.type="sine"; car.frequency.value=f;
-    var mod=actx.createOscillator(); mod.type="sine"; mod.frequency.value=fmod;
-    var mg=actx.createGain();
-    mg.gain.setValueAtTime(iPk,tt);                                    /* bright attack */
-    mg.gain.exponentialRampToValueAtTime(iFl,tt+dur*VOICE.indexDecayAt);/* → round body */
-    mod.connect(mg); mg.connect(car.frequency);
-    var par=actx.createOscillator(); par.type="sine"; par.frequency.value=f*VOICE.partialRatio;
-    var pg=actx.createGain(); pg.gain.value=VOICE.partialGain;
-    car.connect(env); par.connect(pg); pg.connect(env);
-    env.connect(actx.destination);
-    car.start(tt); car.stop(tt+dur+0.05);
-    mod.start(tt); mod.stop(tt+dur+0.05);
-    par.start(tt); par.stop(tt+dur+0.05);
-    voiceLog.push({midi:m, osc:["sine","sine"], ratio:VOICE.ratio,
-      carrierFreq:f, modFreq:fmod,
-      index:{peak:idx, floor:idx*VOICE.indexFloor,
-             modGainPeak:iPk, modGainFloor:iFl, decayAt:dur*VOICE.indexDecayAt},
-      partial:{type:"sine", freq:f*VOICE.partialRatio, gain:VOICE.partialGain},
-      attack:atk, decay:dur, gain:g0, dyn:dyn});
+    var tt=t0+i*spec.stagger;
+    var rec=voice(out,tt,freqOf(m),dur,g0,idx);
+    rec.midi=m; rec.instrument=inst; rec.decay=dur; rec.gain=g0; rec.dyn=dyn;
+    voiceLog.push(rec);
     if(voiceLog.length>96) voiceLog.splice(0,voiceLog.length-96);
   });
 }
 
 /* ---------- physics ----------
-   No Brownian jitter: each entity glides at its own stable pace
-   (assigned at spawn, never changes); temperature only scales the
-   global glide speed. Bounces preserve speed exactly, with at most
-   a ±3° angle nudge so trajectories never settle into perfect loops. */
+   Each entity carries its own stable pace (assigned at spawn, never
+   changes); temperature scales the whole field's speed. The chosen
+   motion model decides how velocity evolves between frames — see
+   MOTION_STEP below. Bounces preserve speed exactly, with at most a
+   ±3° angle nudge so trajectories never settle into perfect loops.  */
 function targetSpeed(e){
   return e.baseSp*(e.pace||1)*(settings.temperature/0.6);
 }
@@ -775,6 +935,185 @@ function thermalize(e,dt){
     var a=rand(0,Math.PI*2);
     e.vx=Math.cos(a)*target; e.vy=Math.sin(a)*target;
   }
+}
+
+/* ---------- the six motions ----------
+   Each step rule mutates velocity for one entity over dt; integration
+   and walls stay common to all of them. Per-model state lives on the
+   entity under short keys (hx/hy/hw for harmonic, lvT for lévy) and is
+   cleared whenever the model changes, so switching never carries stale
+   geometry across.                                                  */
+var BROWN_DRAG=1.7;          /* 1/s — how fast a random walk forgets   */
+var ORBIT_R=0.55;            /* × min-dim: radius where v = target     */
+var ORBIT_SOFT=0.13;         /* × min-dim: softened core, no singularity */
+var ORBIT_CAP=2.6;           /* × target: no slingshot across the field */
+var HARM_W=0.9;              /* × pace → personal angular frequency    */
+var HARM_TRIM=0.5;           /* 1/s — energy relaxation toward target  */
+var FLOCK_R=0.16;            /* × min-dim: neighbourhood radius. Wider
+                                than ~0.25 and the whole field converges
+                                into ONE clump in a corner, which empties
+                                the page; this keeps several small flocks
+                                travelling together across it.         */
+var FLOCK_SEP=58;            /* px: personal space                     */
+var FLOCK_SEP_W=3.0, FLOCK_COH=0.5, FLOCK_ALI=1.7;
+var LEVY_ALPHA=1.4;          /* Pareto tail — <2 is what makes it Lévy */
+var LEVY_MIN=0.35, LEVY_MAX=9;   /* seconds: run-length floor and cap  */
+
+/* standard normal, Box–Muller — the noise source for brownian */
+function gauss(){
+  var u=1-Math.random(), v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+
+/* BROWNIAN — Ornstein–Uhlenbeck: velocity is pulled toward zero by
+   drag while noise kicks it outward. Integrated exactly over dt (not
+   Euler-stepped), so the walk looks identical at 30fps and 120fps.
+   sigma is set so the stationary speed lands on target.            */
+function stepBrownian(e,dt){
+  var target=targetSpeed(e);
+  var d=Math.exp(-BROWN_DRAG*dt);
+  var sigma=target*Math.sqrt(BROWN_DRAG);            /* per-axis */
+  var kick=sigma*Math.sqrt((1-d*d)/(2*BROWN_DRAG));
+  e.vx=e.vx*d+kick*gauss();
+  e.vy=e.vy*d+kick*gauss();
+  var sp=Math.hypot(e.vx,e.vy), cap=target*4;   /* clip the far tail only */
+  if(sp>cap){ e.vx*=cap/sp; e.vy*=cap/sp; }
+}
+
+/* ORBITAL — one attractor at the centre of the field. Inverse-square
+   outside a softened core, so a note that falls straight in swings
+   through instead of diverging. GM is tuned so a circular orbit at
+   ORBIT_R × min-dim runs at exactly the field's target speed.      */
+function stepOrbital(e,dt){
+  var target=targetSpeed(e);
+  var minDim=Math.min(W,H)||600;
+  var dx=(W/2)-e.x, dy=(H/2)-e.y;
+  var r=Math.hypot(dx,dy);
+  if(r<0.001){ dx=1; dy=0; r=1; }
+  var soft=minDim*ORBIT_SOFT;
+  var R=Math.max(r,soft);
+  var GM=target*target*minDim*ORBIT_R;
+  var a=GM/(R*R);
+  e.vx+=(dx/r)*a*dt; e.vy+=(dy/r)*a*dt;
+  var sp=Math.hypot(e.vx,e.vy), cap=target*ORBIT_CAP;
+  if(sp>cap){ e.vx*=cap/sp; e.vy*=cap/sp; }
+}
+/* speed of a circular orbit at radius r — used to seed the field so
+   every note starts ON an orbit instead of falling through the middle */
+function orbitSpeed(e,r){
+  var minDim=Math.min(W,H)||600;
+  var GM=targetSpeed(e)*targetSpeed(e)*minDim*ORBIT_R;
+  return Math.sqrt(GM/Math.max(r,minDim*ORBIT_SOFT));
+}
+
+/* HARMONIC — every note is tethered to a home point and oscillates
+   about it at its own frequency, the field as a set of struck strings.
+   Home is claimed lazily at whatever position the note holds when the
+   model engages. A slow energy trim keeps the swing's amplitude tied
+   to temperature after collisions have added or stolen energy.     */
+function stepHarmonic(e,dt){
+  var target=targetSpeed(e);
+  if(e.hx===undefined){
+    e.hx=e.x; e.hy=e.y;
+    e.hw=HARM_W*(e.pace||1);
+  }
+  var w=e.hw||HARM_W;
+  var ox=e.x-e.hx, oy=e.y-e.hy;
+  e.vx-=ox*w*w*dt; e.vy-=oy*w*w*dt;
+  var sp=Math.hypot(e.vx,e.vy), amp=Math.hypot(ox,oy);
+  var E=0.5*(sp*sp+w*w*amp*amp), E0=0.5*target*target;
+  if(E>1e-6&&sp>1e-6){
+    var f=1+(E0/E-1)*Math.min(1,dt*HARM_TRIM);
+    var k=Math.sqrt(Math.max(0.25,Math.min(4,f)));
+    e.vx*=k; e.vy*=k;
+  }
+}
+
+/* LÉVY FLIGHT — constant speed, but the time between turns is drawn
+   from a Pareto tail (alpha < 2). Most runs are short; occasionally a
+   note sails the whole field in one straight line. That mix of scales
+   is the signature — a random walk with no characteristic step size. */
+function stepLevy(e,dt){
+  e.lvT=(e.lvT||0)-dt;
+  if(e.lvT<=0){
+    var u=Math.max(1e-6,Math.random());
+    e.lvT=Math.min(LEVY_MAX,LEVY_MIN*Math.pow(u,-1/LEVY_ALPHA));
+    var a=rand(0,Math.PI*2), sp=Math.hypot(e.vx,e.vy)||targetSpeed(e)||30;
+    e.vx=Math.cos(a)*sp; e.vy=Math.sin(a)*sp;
+  }
+  thermalize(e,dt);
+}
+
+/* FLOCKING — boids. Steering is computed for the whole field in one
+   pass (below) and stashed on the entity; here it is only applied and
+   the speed renormalised, so the flock turns without speeding up.  */
+function stepFlock(e,dt){
+  e.vx+=(e.fx||0)*dt; e.vy+=(e.fy||0)*dt;
+  thermalize(e,dt);
+}
+function flockSteer(){
+  var list=[], i, j;
+  for(i=0;i<notes.length;i++) if(!notes[i].anchor&&!notes[i].dying) list.push(notes[i]);
+  var R=Math.min(W,H)*FLOCK_R, R2=R*R, SEP2=FLOCK_SEP*FLOCK_SEP;
+  for(i=0;i<list.length;i++){
+    var e=list[i], cx=0, cy=0, ax=0, ay=0, sx=0, sy=0, n=0;
+    for(j=0;j<list.length;j++){
+      if(j===i) continue;
+      var o=list[j], dx=o.x-e.x, dy=o.y-e.y, d2=dx*dx+dy*dy;
+      if(d2>R2||d2<1e-6) continue;
+      cx+=o.x; cy+=o.y; ax+=o.vx; ay+=o.vy; n++;
+      if(d2<SEP2){                       /* crowding pushes back hardest up close */
+        var d=Math.sqrt(d2);
+        sx-=(dx/d)*(1-d/FLOCK_SEP); sy-=(dy/d)*(1-d/FLOCK_SEP);
+      }
+    }
+    var target=targetSpeed(e);
+    var fx=sx*target*FLOCK_SEP_W, fy=sy*target*FLOCK_SEP_W;
+    if(n){
+      /* cohesion is a pull toward a POSITION, so unlike separation and
+         alignment it has no speed in it and would keep herding a field
+         that temperature has already cooled to a stop. Scaling it by
+         temperature keeps that one knob in charge of all six models. */
+      var coh=FLOCK_COH*settings.temperature;
+      fx+=((cx/n)-e.x)*coh + ((ax/n)-e.vx)*FLOCK_ALI;
+      fy+=((cy/n)-e.y)*coh + ((ay/n)-e.vy)*FLOCK_ALI;
+    }
+    e.fx=fx; e.fy=fy;
+  }
+}
+
+var MOTION_STEP={
+  glide:thermalize, brownian:stepBrownian, orbital:stepOrbital,
+  harmonic:stepHarmonic, flocking:stepFlock, levy:stepLevy
+};
+/* Only field NOTES obey the chosen model. Anchors are navigation
+   targets and operators are the field's furniture — both keep the
+   steady glide, which also stops a central attractor from raking every
+   operator into the same core the notes fall through. */
+function moveStep(e,dt){
+  var f=(e.anchor||e.operator)?thermalize:(MOTION_STEP[settings.motion]||thermalize);
+  f(e,dt);
+}
+/* wipe per-model state so a switch starts clean; orbital additionally
+   gets a tangential kick, otherwise a field of radial headings just
+   rains through the centre instead of orbiting.                    */
+function reseatMotion(){
+  var all=notes.concat(operators), mode=settings.motion;
+  all.forEach(function(e){
+    e.hx=undefined; e.hy=undefined; e.hw=undefined;
+    e.lvT=0; e.fx=0; e.fy=0;
+    if(mode==="orbital"&&!e.anchor&&!e.operator){
+      var dx=e.x-W/2, dy=e.y-H/2, r=Math.hypot(dx,dy);
+      if(r>1){
+        /* purely tangential, AT the circular speed for this radius: the
+           field snaps into an orrery rather than raining through the
+           centre. Inner notes run fast, outer ones slow — Kepler, visible. */
+        var sp=orbitSpeed(e,r);
+        var s=(e.vx*(-dy/r)+e.vy*(dx/r))<0?-1:1;   /* keep its own sense of rotation */
+        e.vx=(-dy/r)*sp*s; e.vy=(dx/r)*sp*s;
+      }
+    }
+  });
 }
 function bounce(e,r){
   var hit=false;
@@ -972,7 +1311,13 @@ function collide(){
           logEv("deflect-op",{n:n.id,o:j});
         }
       }
-      if((n.cool[j]||0)>simT) continue;        /* transform cooldown gates the hit */
+      /* ONE transform per ENCOUNTER, on the same re-arm rule as the
+         deflect above. A time-only cooldown was enough while every note
+         flew straight past an operator; models like harmonic and orbital
+         can hold a note in contact indefinitely, and that would fire a
+         transform every 0.8s forever. */
+      if(!fresh) continue;
+      if((n.cool[j]||0)>simT) continue;        /* plus the spawn/settle cooldown */
       n.cool[j]=simT+0.8;
       if(Math.random()<settings.reactivity){
         if(applyOperator(n,o)) logEv("transform",{op:o.label,n:n.id});
@@ -1018,16 +1363,17 @@ function chordBounce(){
 function frame(dt){
   simT+=dt;
   var i,e;
+  if(settings.motion==="flocking") flockSteer();   /* one neighbour pass, then apply */
   for(i=0;i<notes.length;i++){
     e=notes[i];
     if(e.dying) continue;
-    thermalize(e,dt);
+    moveStep(e,dt);
     e.x+=e.vx*dt; e.y+=e.vy*dt;
     bounce(e,e.rv||e.r);
   }
   for(i=0;i<operators.length;i++){
     e=operators[i];
-    thermalize(e,dt);
+    moveStep(e,dt);
     e.x+=e.vx*dt; e.y+=e.vy*dt;
     bounce(e,e.rv||e.r);
   }
@@ -1092,6 +1438,10 @@ function refit(){
     var r=e.rv||e.r;
     e.x=Math.min(Math.max(e.x,r),Math.max(r,W-r));
     e.y=Math.min(Math.max(e.y,r),Math.max(r,H-r));
+    if(e.hx!==undefined){                    /* harmonic homes follow the walls */
+      e.hx=Math.min(Math.max(e.hx,r),Math.max(r,W-r));
+      e.hy=Math.min(Math.max(e.hy,r),Math.max(r,H-r));
+    }
   });
   renderAll();
 }
@@ -1170,6 +1520,8 @@ var els={
   density:[document.getElementById("s-dens"),document.getElementById("v-dens")]
 };
 var selScale=document.getElementById("s-scale");
+var selMotion=document.getElementById("s-motion");
+var selInst=document.getElementById("s-inst");
 function fmtVal(key){
   return key==="density" ? String(settings.density) : Number(settings[key]).toFixed(2);
 }
@@ -1179,8 +1531,17 @@ function syncDrawer(){
     els[k][1].textContent=fmtVal(k);
   }
   selScale.value=settings.scale;
+  selMotion.value=settings.motion;
+  selInst.value=settings.instrument;
 }
+/* the motion model is the one setting that owns per-entity state, so a
+   change to it has to reseat the field rather than just be saved */
+var lastMotion=settings.motion;
 function applySettings(){
+  if(settings.motion!==lastMotion){
+    lastMotion=settings.motion;
+    reseatMotion();
+  }
   adjustDensity();
   saveSettings();
 }
@@ -1194,6 +1555,15 @@ for(var key in els)(function(k){
 selScale.addEventListener("change",function(){
   settings.scale=this.value;
   applySettings();
+});
+selMotion.addEventListener("change",function(){
+  settings.motion=this.value;
+  applySettings();
+});
+selInst.addEventListener("change",function(){
+  settings.instrument=this.value;
+  applySettings();
+  arpeggio(lastArp?lastArp.tones:[60,64,67],DYN_GAIN.mf,"mf");   /* hear the swap */
 });
 syncDrawer();
 
@@ -1218,6 +1588,10 @@ window.__demo={
   soundOn:function(){return soundOn;},
   setSound:function(on){ if(!!on!==soundOn) btnSound.click(); },
   voiceParams:function(){var v={};for(var k in VOICE)v[k]=VOICE[k];return v;},
+  motions:function(){var a=[];for(var k in MOTIONS)a.push(k);return a;},
+  instruments:function(){var a=[];for(var k in INSTRUMENTS)a.push(k);return a;},
+  reseatMotion:reseatMotion,
+  flockSteerNow:flockSteer,
   toneCap:toneCap,
   interactions:function(){return interactions;},
   setInteractions:function(v,apply){
