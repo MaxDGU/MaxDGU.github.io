@@ -188,6 +188,16 @@ body{
     </select>
   </div>
   <div class="row">
+    <label for="s-voicing">voicing</label>
+    <select id="s-voicing">
+      <option value="random">random</option>
+      <option value="triad">triad</option>
+      <option value="quartal">quartal</option>
+      <option value="pentatonic">pentatonic</option>
+      <option value="overtone">overtone</option>
+    </select>
+  </div>
+  <div class="row">
     <label for="s-motion">motion</label>
     <select id="s-motion">
       <option value="glide">glide</option>
@@ -266,7 +276,13 @@ function freqOf(m){return 440*Math.pow(2,(m-69)/12);}
 
 /* ---------- dynamics settings (persisted) ---------- */
 var LS_KEY="site-dynamics-v2";
-var DEFAULTS={temperature:1.0, reactivity:1.0, density:18, scale:"chromatic",
+/* scale and voicing default to the SAME pitch classes on purpose. The
+   voicing decides what is born, the scale decides where a transform can
+   step; matched, the field stays inside one consonant set indefinitely.
+   Left mismatched — the old chromatic default — a seeded field drifts
+   back to all twelve tones within a few minutes of transforms. */
+var DEFAULTS={temperature:1.0, reactivity:1.0, density:18,
+              scale:"minor pentatonic", voicing:"pentatonic",
               motion:"glide", instrument:"piano"};
 var SCALES={
   "chromatic":[0,1,2,3,4,5,6,7,8,9,10,11],
@@ -275,6 +291,29 @@ var SCALES={
   "whole-tone":[0,2,4,6,8,10],
   "dorian":[0,2,3,5,7,9,10]
 };
+
+/* ---------- voicing: what the field is built out of ----------
+   Every field note used to be a uniform random semitone across C3–C6.
+   Any two could therefore meet at a minor second, and since notes fuse
+   into chords on contact, the harmony of the whole page was a coin
+   toss. A voicing is a pitch-class set that all new notes are drawn
+   from, so any combination the field arrives at is already consonant:
+   stack a triad's tones in any order and octave and it stays a triad.
+
+   `set` is null for `random`, which is the original behaviour.
+   Pitches are snapped to the active scale afterwards, so this menu and
+   the scale menu compose rather than fight.                          */
+var VOICINGS={
+  "random":     {set:null},
+  "triad":      {set:[0,4,7]},        /* root, third, fifth            */
+  "quartal":    {set:[0,5,10]},       /* stacked fourths               */
+  "pentatonic": {set:[0,3,5,7,10]},   /* minor pentatonic              */
+  "overtone":   {set:[0,2,4,7,10]}    /* partials 1,3,5,7,9 of the root */
+};
+/* Only these intervals stay clear down in the bass — a third voiced low
+   is mud on any instrument, which is why arrangers avoid it there. */
+var BASS_TONES=[0,5,7];
+var BASS_TOP=59;             /* below C4 counts as the bass register  */
 
 /* ---------- motion models ----------
    Six laws of motion for the same field. `glide` is the original:
@@ -316,6 +355,7 @@ try{
   if(!SCALES[settings.scale]) settings.scale=DEFAULTS.scale;
   if(!MOTIONS[settings.motion]) settings.motion=DEFAULTS.motion;
   if(!INSTRUMENTS[settings.instrument]) settings.instrument=DEFAULTS.instrument;
+  if(!VOICINGS[settings.voicing]) settings.voicing=DEFAULTS.voicing;
 }catch(e){}
 function saveSettings(){
   try{ localStorage.setItem(LS_KEY,JSON.stringify(settings)); }catch(e){}
@@ -357,6 +397,61 @@ function snapSet(set){
   var out=[];
   set.forEach(function(m){ var s=snapToScale(m); if(out.indexOf(s)<0) out.push(s); });
   return out.sort(function(a,b){return a-b;});
+}
+
+/* Pick a register FIRST, then a pitch class from the voicing inside it.
+   Choosing register first keeps the field from stacking up in one
+   octave, and lets the bass be treated differently from the rest. */
+function seedPitch(){
+  var v=VOICINGS[settings.voicing], set=v&&v.set;
+  /* `random` is the original uniform draw, still snapped to the active
+     scale so the invariant "every note sits on the scale" holds for all
+     voicings. Under the chromatic scale the snap is the identity, so
+     this reproduces the old field exactly. */
+  if(!set) return snapToScale(NOTE_MIN+Math.floor(rand(0,NOTE_MAX-NOTE_MIN+1)));
+  var r=Math.random(), lo, hi;
+  if(r<0.25){ lo=NOTE_MIN; hi=BASS_TOP; }            /* a quarter down low */
+  else if(r<0.70){ lo=BASS_TOP+1; hi=BASS_TOP+12; }  /* most in the middle */
+  else { lo=BASS_TOP+13; hi=NOTE_MAX; }
+  var pcs=set;
+  if(hi<=BASS_TOP){
+    pcs=set.filter(function(pc){ return BASS_TONES.indexOf(pc)>=0; });
+    if(!pcs.length) pcs=[set[0]];
+  }
+  var pc=pcs[Math.floor(Math.random()*pcs.length)];
+  var m=lo+((((pc-lo)%12)+12)%12);                   /* lowest such note ≥ lo */
+  var span=Math.floor((hi-m)/12);
+  if(span>0) m+=12*Math.floor(Math.random()*(span+1));
+  m=snapToScale(m);
+  if(m>NOTE_MAX) m-=12;
+  if(m<NOTE_MIN) m+=12;
+  return m;
+}
+/* nearest tone of the voicing, by shortest move around the circle —
+   used to retune the field in place when the menu changes, so the
+   switch is heard as a modulation rather than seen as a reshuffle */
+function snapToVoicing(midi){
+  var v=VOICINGS[settings.voicing], set=v&&v.set;
+  if(!set) return midi;
+  var pc=((midi%12)+12)%12, bestAbs=99, bestD=0;
+  for(var i=0;i<set.length;i++){
+    var d=((set[i]-pc)%12+12)%12;
+    if(d>6) d-=12;
+    if(Math.abs(d)<bestAbs){ bestAbs=Math.abs(d); bestD=d; }
+  }
+  return wrapRange(midi+bestD);
+}
+function reseatVoicing(){
+  notes.forEach(function(n){
+    if(n.anchor||n.dying) return;    /* anchors are the site's own identity */
+    var out=[];
+    n.tones.forEach(function(m){
+      var t=snapToScale(snapToVoicing(m));
+      if(out.indexOf(t)<0) out.push(t);
+    });
+    n.tones=out.sort(function(a,b){return a-b;});
+    restyleNote(n);
+  });
 }
 
 /* ---------- note geometry ----------
@@ -520,7 +615,7 @@ function restyleNote(n){
 
 function spawnNote(fade){
   var el=makeEntity("note");
-  var midi=NOTE_MIN+Math.floor(rand(0,NOTE_MAX-NOTE_MIN+1));
+  var midi=seedPitch();
   var sp=rand(28,64), ang=rand(0,Math.PI*2);
   var n={el:el, id:UID++, tones:[midi], flag:Math.random()<0.45, dyn:"mf",
          x:rand(60,W-60), y:rand(80,H-80),
@@ -781,6 +876,18 @@ var VOICE={ratio:2, attack:0.030, indexFloor:0.12, indexDecayAt:0.7,
    compressor. The sustaining voices (synth, reed) overlap far more than
    the struck piano does, and a dense field can fire several chords at
    once — the compressor is what guarantees none of that ever clips. */
+var noiseBuf=null;
+/* two seconds of noise, made once and looped — allocating a fresh buffer
+   per note would churn memory in a field that plays constantly */
+function noiseBuffer(){
+  if(!noiseBuf&&actx){
+    var n=Math.floor(actx.sampleRate*2);
+    noiseBuf=actx.createBuffer(1,n,actx.sampleRate);
+    var d=noiseBuf.getChannelData(0);
+    for(var i=0;i<n;i++) d[i]=Math.random()*2-1;
+  }
+  return noiseBuf;
+}
 function masterOut(){
   if(!actx) return null;
   if(!master){
@@ -853,38 +960,84 @@ function voiceSynth(out,tt,f,dur,g0,idx){
           attack:atk};
 }
 
-/* SAXOPHONE — a sawtooth is already reed-like; what makes it read as a
-   horn is the rest: a slower breath attack, a peaking formant around
-   1.1kHz for the honk in the throat of the instrument, and a vibrato
-   that fades IN after the note speaks rather than sitting on it from
-   the start. */
+/* SAXOPHONE — a lowpassed sawtooth is NOT a saxophone, which is what
+   this was. Measured, the old voice was fundamental-dominant with
+   everything above the 5th harmonic gone: a filtered synth pad. Three
+   things separate a reed from that, and all three are here now.
+
+   1. SPECTRAL TILT. A sax is a conical bore: the 2nd and 3rd harmonics
+      sit at or above the fundamental, and energy runs out past the 10th.
+      A gentle highpass just under the fundamental buys that tilt.
+   2. FIXED FORMANTS. The bore resonates at the same frequencies whatever
+      note is fingered — around 800, 1600 and 2700 Hz. Because they do
+      NOT move with pitch, low notes come out buzzy and rich while high
+      notes come out pure, exactly as the real instrument does. The
+      filters are capped in absolute Hz for the same reason.
+   3. BREATH. Air through a bandpass around 3kHz, loud at the moment the
+      reed speaks and never quite gone after. Scaled back as pitch rises,
+      where there are fewer harmonics to hide it behind.
+
+   Plus the two gestures of playing one: a small scoop up into the note
+   as the reed catches, and vibrato that only arrives once the tone is
+   established.                                                       */
+var SAX={hpRel:1.1, hpCap:320, lpRel:8, lpCap:5200, lpFrom:2.2, lpOpen:0.09,
+         formants:[[800,1.1,9],[1600,1.5,7],[2700,2.0,7]],
+         noiseHz:3200, noiseQ:0.9, noisePeak:0.5, noiseSus:0.06,
+         vibRate:5.2, vibDepth:0.005, vibDelay:0.22, scoop:0.03};
 function voiceSax(out,tt,f,dur,g0,idx){
-  var atk=0.075, rel=dur*0.45;
+  var atk=0.055, rel=dur*0.42, i;
   var env=actx.createGain();
   env.gain.setValueAtTime(0.0001,tt);
-  env.gain.exponentialRampToValueAtTime(g0,tt+atk);
+  env.gain.exponentialRampToValueAtTime(g0,tt+atk);       /* breath rising */
   env.gain.setValueAtTime(g0,tt+dur-rel);
   env.gain.exponentialRampToValueAtTime(0.0001,tt+dur);
-  var lp=actx.createBiquadFilter(); lp.type="lowpass"; lp.Q.value=1.2;
-  var top=Math.min(9000,f*(3+4*idx)), bot=Math.max(400,f*2);
-  lp.frequency.setValueAtTime(top,tt);
-  lp.frequency.exponentialRampToValueAtTime(bot,tt+dur*0.8);
-  var fmt=actx.createBiquadFilter(); fmt.type="peaking";
-  fmt.frequency.value=1100; fmt.Q.value=1.4; fmt.gain.value=9;
-  var osc=actx.createOscillator(); osc.type="sawtooth"; osc.frequency.value=f;
-  var lfo=actx.createOscillator(); lfo.type="sine"; lfo.frequency.value=5.4;
+
+  var osc=actx.createOscillator(); osc.type="sawtooth";
+  osc.frequency.setValueAtTime(f*(1-SAX.scoop),tt);       /* the reed catches */
+  osc.frequency.linearRampToValueAtTime(f,tt+0.06);
+  var lfo=actx.createOscillator(); lfo.type="sine"; lfo.frequency.value=SAX.vibRate;
   var lg=actx.createGain();
-  lg.gain.setValueAtTime(0.0001,tt);                             /* vibrato fades in */
-  lg.gain.linearRampToValueAtTime(f*0.007,tt+Math.min(0.35,dur*0.5));
+  lg.gain.setValueAtTime(0.0001,tt);
+  lg.gain.setValueAtTime(0.0001,tt+SAX.vibDelay);         /* held off, then in */
+  lg.gain.linearRampToValueAtTime(f*SAX.vibDepth,tt+SAX.vibDelay+0.25);
   lfo.connect(lg); lg.connect(osc.frequency);
-  osc.connect(lp); lp.connect(fmt); fmt.connect(env); env.connect(out);
+
+  /* breath: one shared noise buffer, band-passed to the air register */
+  var nz=actx.createBufferSource(); nz.buffer=noiseBuffer(); nz.loop=true;
+  var nb=actx.createBiquadFilter(); nb.type="bandpass";
+  nb.frequency.value=SAX.noiseHz; nb.Q.value=SAX.noiseQ;
+  var ng=actx.createGain();
+  var air=Math.max(0.45,Math.min(1,500/f));               /* less hiss up high */
+  ng.gain.setValueAtTime(0.0001,tt);
+  ng.gain.exponentialRampToValueAtTime(SAX.noisePeak*air,tt+0.020);   /* chiff */
+  ng.gain.exponentialRampToValueAtTime(SAX.noiseSus*air,tt+0.10);
+  nz.connect(nb); nb.connect(ng);
+
+  var hp=actx.createBiquadFilter(); hp.type="highpass";
+  hp.frequency.value=Math.min(f*SAX.hpRel,SAX.hpCap); hp.Q.value=0;
+  var lp=actx.createBiquadFilter(); lp.type="lowpass"; lp.Q.value=0.5;
+  var lpTop=Math.min(f*SAX.lpRel*(0.6+0.4*idx),SAX.lpCap);
+  lp.frequency.setValueAtTime(Math.min(f*SAX.lpFrom,lpTop),tt);
+  lp.frequency.exponentialRampToValueAtTime(lpTop,tt+SAX.lpOpen);
+  osc.connect(hp); ng.connect(hp); hp.connect(lp);
+
+  var node=lp, fmts=[];
+  for(i=0;i<SAX.formants.length;i++){
+    var spec=SAX.formants[i];
+    var pk=actx.createBiquadFilter(); pk.type="peaking";
+    pk.frequency.value=spec[0]; pk.Q.value=spec[1]; pk.gain.value=spec[2];
+    node.connect(pk); node=pk; fmts.push(spec[0]);
+  }
+  node.connect(env); env.connect(out);
   osc.start(tt); osc.stop(tt+dur+0.05);
   lfo.start(tt); lfo.stop(tt+dur+0.05);
-  return {osc:["sawtooth"], carrierFreq:f,
-          filter:{type:"lowpass", from:top, to:bot, Q:1.2},
-          formant:{freq:1100, Q:1.4, gain:9},
-          vibrato:{rate:5.4, depth:f*0.007},
-          attack:atk};
+  nz.start(tt);  nz.stop(tt+dur+0.05);
+  return {osc:["sawtooth","noise"], carrierFreq:f,
+          highpass:hp.frequency.value,
+          filter:{type:"lowpass", from:Math.min(f*SAX.lpFrom,lpTop), to:lpTop, Q:0.5},
+          formants:fmts, breath:{hz:SAX.noiseHz, peak:SAX.noisePeak*air, sustain:SAX.noiseSus*air},
+          vibrato:{rate:SAX.vibRate, depth:f*SAX.vibDepth, delay:SAX.vibDelay},
+          scoop:SAX.scoop, attack:atk};
 }
 
 var VOICE_FN={piano:voicePiano, synth:voiceSynth, saxophone:voiceSax};
@@ -1521,6 +1674,7 @@ var els={
 };
 var selScale=document.getElementById("s-scale");
 var selMotion=document.getElementById("s-motion");
+var selVoicing=document.getElementById("s-voicing");
 var selInst=document.getElementById("s-inst");
 function fmtVal(key){
   return key==="density" ? String(settings.density) : Number(settings[key]).toFixed(2);
@@ -1533,14 +1687,19 @@ function syncDrawer(){
   selScale.value=settings.scale;
   selMotion.value=settings.motion;
   selInst.value=settings.instrument;
+  selVoicing.value=settings.voicing;
 }
 /* the motion model is the one setting that owns per-entity state, so a
    change to it has to reseat the field rather than just be saved */
-var lastMotion=settings.motion;
+var lastMotion=settings.motion, lastVoicing=settings.voicing, lastScale=settings.scale;
 function applySettings(){
   if(settings.motion!==lastMotion){
     lastMotion=settings.motion;
     reseatMotion();
+  }
+  if(settings.voicing!==lastVoicing||settings.scale!==lastScale){
+    lastVoicing=settings.voicing; lastScale=settings.scale;
+    reseatVoicing();          /* retune what is already out there */
   }
   adjustDensity();
   saveSettings();
@@ -1558,6 +1717,10 @@ selScale.addEventListener("change",function(){
 });
 selMotion.addEventListener("change",function(){
   settings.motion=this.value;
+  applySettings();
+});
+selVoicing.addEventListener("change",function(){
+  settings.voicing=this.value;
   applySettings();
 });
 selInst.addEventListener("change",function(){
@@ -1589,6 +1752,8 @@ window.__demo={
   setSound:function(on){ if(!!on!==soundOn) btnSound.click(); },
   voiceParams:function(){var v={};for(var k in VOICE)v[k]=VOICE[k];return v;},
   motions:function(){var a=[];for(var k in MOTIONS)a.push(k);return a;},
+  voicings:function(){var a=[];for(var k in VOICINGS)a.push(k);return a;},
+  seedPitch:seedPitch, snapToVoicing:snapToVoicing, reseatVoicing:reseatVoicing,
   instruments:function(){var a=[];for(var k in INSTRUMENTS)a.push(k);return a;},
   reseatMotion:reseatMotion,
   flockSteerNow:flockSteer,
