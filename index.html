@@ -3,10 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>max gupta</title>
-<meta name="description" content="max gupta — notes, operators, and the space between">
-<meta property="og:title" content="max gupta">
-<meta property="og:type" content="website">
+<title>Max Gupta</title>
+<meta name="description" content="Max Gupta — master's student at Princeton working on meta-learning, few-shot concept learning, and human inductive biases in neural networks.">
+<meta property="og:title" content="Max Gupta">
+<meta property="og:description" content="Psychology × Computer Science. Princeton Computational Cognitive Science lab.">
+<meta property="og:type" content="profile">
+<meta name="author" content="Max Gupta">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2016'%3E%3Cellipse%20cx='7.2'%20cy='10'%20rx='4.6'%20ry='3.2'%20fill='%23B4834C'%20transform='rotate(-20%207.2%2010)'/%3E%3Cline%20x1='11.2'%20y1='9'%20x2='11.2'%20y2='1.6'%20stroke='%23B4834C'%20stroke-width='1.3'/%3E%3C/svg%3E">
 <style>
 :root{
@@ -152,9 +154,224 @@ body{
 }
 #drawer input:focus-visible,#drawer select:focus-visible{outline:1px solid var(--accent);outline-offset:3px}
 
+/* ================= SCIENCE — the plain page =================
+   A standard academic page: one narrow column of text on paper, a
+   serif face, links that look like links. Nothing here moves. The
+   only thing it shares with the field is the brass accent and the
+   ink, so the two sides read as one site in two moods.          */
+:root{
+  --paper-lt:#FBF9F4;
+  --ink-lt:#1C1E22;
+  --muted:#5E6169;
+  --rule:rgba(28,30,34,.13);
+}
+body[data-mode="science"]{
+  background:var(--paper-lt);
+  color:var(--ink-lt);
+  font-family:var(--serif);
+  line-height:1.62;
+}
+body[data-mode="arts"] #science{display:none}
+body[data-mode="science"] #arts{display:none}
+
+#science{
+  max-width:44rem;
+  margin:0 auto;
+  padding:clamp(56px,9vh,104px) 7vw clamp(64px,12vh,120px);
+  font-size:17px;
+}
+#science h1{
+  margin:0;
+  font-size:clamp(30px,5vw,40px);
+  font-weight:400;letter-spacing:.005em;
+}
+#science .sub{
+  margin:.35em 0 1.5em;
+  font-family:var(--mono);
+  font-size:12px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--accent);
+}
+#science .bio{margin:0 0 .4em;color:#2A2D33}
+#science section{margin-top:2.9em}
+#science h2{
+  margin:0 0 .85em;
+  font-family:var(--mono);
+  font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  font-weight:400;color:var(--muted);
+  padding-bottom:.6em;border-bottom:1px solid var(--rule);
+}
+#science a{color:var(--ink-lt);text-decoration:underline;text-decoration-color:rgba(180,131,76,.55);
+  text-underline-offset:2px;text-decoration-thickness:1px}
+#science a:hover{color:#7A5629;text-decoration-color:var(--accent)}
+#science a:focus-visible{outline:1px solid var(--accent);outline-offset:2px}
+
+/* education / elsewhere: term on the left, gloss under it */
+#science .cv{margin:0}
+#science .cv dt{font-weight:400;margin-top:.9em}
+#science .cv dt:first-child{margin-top:0}
+#science .cv dd{margin:.1em 0 0;color:var(--muted);font-size:15.5px}
+
+/* publications: hanging indent, the way a reference list is set */
+#science .pubs{margin:0;padding:0;list-style:none;counter-reset:pub}
+#science .pubs li{
+  position:relative;
+  margin:0 0 1.15em;padding-left:2.1em;
+  font-size:16px;
+}
+#science .pubs li::before{
+  counter-increment:pub;content:counter(pub);
+  position:absolute;left:.15em;top:.28em;
+  font-family:var(--mono);font-size:11px;color:var(--muted);
+}
+/* own name in bold, the usual convention — NOT underlined, which would
+   read as one more link in a list that is already full of them */
+#science .au{font-weight:700}
+#science .ven{color:var(--muted);font-style:italic}
+#science .note{display:block;font-size:14.5px;color:var(--muted)}
+#science .contact{margin:0}
+#science .foot{
+  margin:2.6em 0 0;font-family:var(--mono);
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+}
+
+/* ---------------- the toggle ----------------
+   One control, top right, in both modes. It names the side you are
+   NOT on, so it reads as a destination rather than a state. */
+#toggle{
+  position:fixed;top:20px;right:22px;z-index:40;
+  display:flex;align-items:center;gap:8px;
+  background:transparent;border:1px solid var(--rule);
+  border-radius:999px;
+  padding:7px 15px 6px 12px;
+  font-family:var(--mono);font-size:11px;
+  letter-spacing:.22em;text-transform:uppercase;
+  color:var(--muted);cursor:pointer;
+  transition:color .2s var(--ease),border-color .2s var(--ease),background .2s var(--ease);
+}
+#toggle:hover{color:var(--ink-lt);border-color:rgba(28,30,34,.3)}
+#toggle:focus-visible{outline:1px solid var(--accent);outline-offset:3px}
+.tog-dot{
+  width:6px;height:6px;background:var(--accent);
+  transform:rotate(45deg);
+  transition:transform .3s var(--ease);
+}
+#toggle:hover .tog-dot{transform:rotate(135deg)}
+body[data-mode="arts"] #toggle{
+  border-color:var(--hairline);
+  color:rgba(237,231,219,.55);
+}
+body[data-mode="arts"] #toggle:hover{
+  color:var(--paper);border-color:rgba(237,231,219,.35);
+}
+/* the field's own chrome sits top-left / bottom, so the toggle never
+   collides with it; on a phone the mark moves down out of its way */
+@media (max-width:600px){
+  #toggle{top:14px;right:14px;padding:6px 12px 5px 10px}
+  #science{font-size:16px;padding-top:76px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  #toggle,.tog-dot{transition:none}
+}
+
 </style>
 </head>
-<body>
+<body data-mode="science">
+
+<button id="toggle" type="button" aria-pressed="false">
+  <span class="tog-dot" aria-hidden="true"></span><span id="tog-label">Arts</span>
+</button>
+
+<!-- ======================= SCIENCE ======================= -->
+<main id="science">
+  <header class="pg-head">
+    <h1>Max Gupta</h1>
+    <p class="sub">Psychology &#215; Computer Science</p>
+    <p class="bio">
+      I&rsquo;m a master&rsquo;s student at <a href="https://www.princeton.edu/">Princeton University</a>,
+      working in the <a href="https://cocosci.princeton.edu/">Computational Cognitive Science lab</a>
+      and the Princeton Laboratory for Artificial Intelligence with
+      <a href="https://cocosci.princeton.edu/tom/index.php">Tom Griffiths</a>. My research is on
+      meta-learning, few-shot concept learning, and aligning neural networks with human inductive
+      biases. Before Princeton I spent three years as a consultant and software engineer, and I
+      studied applied mathematics at <a href="https://www.columbia.edu/">Columbia University</a>.
+    </p>
+  </header>
+
+  <section>
+    <h2>Education</h2>
+    <dl class="cv">
+      <dt>Princeton University</dt>
+      <dd>M.S.E., Computer Science. 2024&ndash;2026.
+          Graduate Fellowship (full tuition and teaching salary).</dd>
+      <dt>Columbia University</dt>
+      <dd>B.A., Applied Mathematics. 2017&ndash;2021.
+          Dean&rsquo;s List; Heinrich Research Fellowship; Spritz Family Research Grant.</dd>
+    </dl>
+  </section>
+
+  <section>
+    <h2>Publications &amp; Presentations</h2>
+    <ol class="pubs">
+      <li>
+        <span class="au">Gupta, M.</span>, Rane, S., McCoy, R. T., &amp; Griffiths, T. L. (2025).
+        <a href="https://arxiv.org/abs/2503.23212">Convolutional neural networks can (meta-)learn
+        the same-different relation</a>.
+        <span class="ven">Proceedings of the 47th Annual Conference of the Cognitive Science Society.</span>
+        <span class="note">Also presented as a poster at the Frontiers in NeuroAI Symposium,
+        Kempner Institute, Harvard University.</span>
+      </li>
+      <li>
+        Bencomo, G., <span class="au">Gupta, M.</span>, Marinescu, I., McCoy, R. T., &amp; Griffiths, T. L. (2025).
+        <a href="https://arxiv.org/abs/2502.20237">Teasing apart architecture and initial weights
+        as sources of inductive bias in neural networks</a>.
+        <span class="ven">Proceedings of the 47th Annual Conference of the Cognitive Science Society.</span>
+      </li>
+      <li>
+        <span class="au">Gupta, M.</span> (2025).
+        <a href="https://arxiv.org/abs/2508.01948">Navigating high dimensional concept space with
+        metalearning</a>.
+        <span class="ven">ICML 2025 Workshop on High-Dimensional Learning Dynamics.</span>
+      </li>
+      <li>
+        Hawkins, R. D., <span class="au">Gupta, M.</span>, Fang, K., Wu, C. M., &amp; Franke, M. (2025).
+        Networks with pragmatic listeners are less vulnerable to misinformation.
+        <span class="ven">Society for Personality and Social Psychology Annual Convention.</span>
+      </li>
+      <li>
+        Azizi, E., Azad, T., <span class="au">Gupta, M.</span>, &amp; Nazaret, A.
+        Ensembling in variational autoencoder architectures for effective posterior distribution
+        of cell state estimation.
+        <span class="ven">Azizi Lab talk, Columbia University.</span>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Elsewhere</h2>
+    <dl class="cv">
+      <dt><a href="https://scholar.google.com/citations?user=8n1BqYUAAAAJ&amp;hl=en">Scholar</a></dt>
+      <dd>Google Scholar profile &mdash; citations and preprints.</dd>
+      <dt><a href="https://github.com/MaxDGU">Tech</a></dt>
+      <dd>Code on GitHub: meta-learning experiments, cognitive models, and this site.</dd>
+      <dt><a href="./worlds.html">Worlds</a></dt>
+      <dd>The authors and musicians in rotation &mdash; what I&rsquo;m reading and listening to.</dd>
+    </dl>
+  </section>
+
+  <section>
+    <h2>Contact</h2>
+    <p class="contact">
+      <a href="mailto:mg7411@princeton.edu">mg7411@princeton.edu</a> &middot;
+      <a href="assets/Max%20Gupta%20CV-2026.pdf">Curriculum vitae (PDF)</a> &middot;
+      <a href="https://www.linkedin.com/in/max-g-991112a5/">LinkedIn</a>
+    </p>
+    <p class="foot">Princeton, New Jersey.</p>
+  </section>
+</main>
+
+<!-- ======================== ARTS ========================= -->
+<div id="arts" hidden>
 <div id="stage"></div>
 <div id="mark"></div>
 <button class="ctl" id="btn-pause" aria-pressed="false">pause</button>
@@ -217,6 +434,7 @@ body{
     </select>
   </div>
 </div>
+</div><!-- /#arts -->
 
 <script>
 (function(){
@@ -232,12 +450,10 @@ body{
 var SITE={
   name:"max gupta",
   links:[
+    /* the arts side carries only the two arts links; scholar, tech,
+       worlds and contact live as plain text on the science page */
     {id:"writing", label:"writing", url:"https://substack.com/@maxgupta662811"},
-    {id:"tech",    label:"tech",    url:"https://github.com/MaxDGU"},
-    {id:"sound",   label:"sound",   url:"https://soundcloud.com/max-gupta-777538832"},
-    {id:"scholar", label:"scholar", url:"https://scholar.google.com/citations?user=8n1BqYUAAAAJ&hl=en"},
-    {id:"worlds",  label:"worlds",  url:"./worlds.html"},
-    {id:"contact", label:"contact", url:"mailto:max@priorcomputers.ai"}
+    {id:"sound",   label:"sound",   url:"https://soundcloud.com/max-gupta-777538832"}
   ]
 };
 
@@ -694,8 +910,32 @@ function minPairDist(pts){
   }
   return m;
 }
+/* The slot layouts are drawn for a full set of six links. With fewer —
+   the arts side carries two — taking the first n would bunch them in
+   whichever corner of the layout happens to come first. Farthest-point
+   sampling instead picks the n slots that are furthest apart, so two
+   anchors land on a diagonal and the field stays balanced. */
+function pickSlots(slots,n){
+  if(n>=slots.length) return slots;
+  var chosen=[0], i, j;
+  while(chosen.length<n){
+    var best=-1, bestD=-1;
+    for(i=0;i<slots.length;i++){
+      if(chosen.indexOf(i)>=0) continue;
+      var d=Infinity;
+      for(j=0;j<chosen.length;j++){
+        var dx=slots[i][0]-slots[chosen[j]][0], dy=slots[i][1]-slots[chosen[j]][1];
+        d=Math.min(d,dx*dx+dy*dy);
+      }
+      if(d>bestD){ bestD=d; best=i; }
+    }
+    if(best<0) break;
+    chosen.push(best);
+  }
+  return chosen.map(function(k){ return slots[k]; });
+}
 function anchorSpots(){
-  var slots=(W>=H?ANCHOR_SLOTS_LANDSCAPE:ANCHOR_SLOTS_PORTRAIT);
+  var slots=pickSlots(W>=H?ANCHOR_SLOTS_LANDSCAPE:ANCHOR_SLOTS_PORTRAIT,SITE.links.length);
   var minDim=Math.min(W,H), need=minDim*ANCHOR_MIN_SEP;
   var mx=W*0.08, my=H*0.08;                      /* ≥8% edge margins */
   var out=[], scale=1, attempt;
@@ -1610,7 +1850,6 @@ function init(){
   bootDeadline=performance.now()+2000;
   tryBoot();
 }
-init();
 window.addEventListener("resize",onResize);
 window.addEventListener("orientationchange",onResize);
 
@@ -1624,7 +1863,7 @@ function loop(t){
   renderAll();
 }
 function start(){
-  if(running||reduced||paused||document.hidden) return;
+  if(running||reduced||paused||document.hidden||mode!=="arts") return;
   running=true; lastT=performance.now();
   rafId=requestAnimationFrame(loop);
 }
@@ -1633,11 +1872,52 @@ function stop(){
   if(rafId) cancelAnimationFrame(rafId);
 }
 
-if(!reduced) start();
-
 document.addEventListener("visibilitychange",function(){
   if(document.hidden) stop(); else start();
 });
+
+/* ---------- the two sides ----------
+   Science is the landing page and is plain HTML: it costs nothing and
+   is up before the script runs. The field is only built the first time
+   someone asks for it — spawning depends on measured element sizes,
+   and a hidden subtree measures zero, so the arts side must be VISIBLE
+   before init() is allowed to run. Leaving arts stops the loop, so the
+   simulation never burns a frame behind the reading page.          */
+var artsEl=document.getElementById("arts");
+var toggleEl=document.getElementById("toggle");
+var togLabel=document.getElementById("tog-label");
+var LS_MODE="site-mode-v1";
+var mode="science";
+
+function applyMode(next,remember){
+  mode=(next==="arts")?"arts":"science";
+  var isArts=(mode==="arts");
+  document.body.setAttribute("data-mode",mode);
+  artsEl.hidden=!isArts;
+  togLabel.textContent=isArts?"Science":"Arts";
+  toggleEl.setAttribute("aria-pressed",String(isArts));
+  toggleEl.setAttribute("aria-label",isArts?"Switch to the science page":"Switch to the arts field");
+  document.title=isArts?"max gupta — arts":"Max Gupta";
+  if(isArts){
+    if(!booted){ init(); }     /* first visit: build the field, now that it has size */
+    else { refit(); }          /* later visits: it may have been resized while away */
+    start();
+  }else{
+    stop();
+  }
+  if(remember!==false){
+    try{ localStorage.setItem(LS_MODE,mode); }catch(e){}
+    if(history.replaceState) history.replaceState(null,"",isArts?"#arts":location.pathname+location.search);
+  }
+}
+toggleEl.addEventListener("click",function(){
+  applyMode(mode==="arts"?"science":"arts");
+});
+/* a direct link to #arts wins; otherwise the last side chosen here */
+var wanted=null;
+if(/^#arts\b/.test(location.hash)) wanted="arts";
+else { try{ wanted=localStorage.getItem(LS_MODE); }catch(e){} }
+applyMode(wanted==="arts"?"arts":"science", false);
 
 /* ---------- controls ---------- */
 var btnPause=document.getElementById("btn-pause");
@@ -1751,6 +2031,8 @@ window.__demo={
   soundOn:function(){return soundOn;},
   setSound:function(on){ if(!!on!==soundOn) btnSound.click(); },
   voiceParams:function(){var v={};for(var k in VOICE)v[k]=VOICE[k];return v;},
+  mode:function(){return mode;},
+  setMode:applyMode,
   motions:function(){var a=[];for(var k in MOTIONS)a.push(k);return a;},
   voicings:function(){var a=[];for(var k in VOICINGS)a.push(k);return a;},
   seedPitch:seedPitch, snapToVoicing:snapToVoicing, reseatVoicing:reseatVoicing,
