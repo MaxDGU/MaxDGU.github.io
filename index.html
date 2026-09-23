@@ -23,7 +23,14 @@
   --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
 }
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;overflow:hidden}
+html{height:100%}
+html,body{margin:0}
+body{min-height:100%}
+/* The field is entirely fixed-position and must never scroll — that
+   rule used to sit on html+body unconditionally, which also froze the
+   science page, a document far taller than the viewport. Lock scrolling
+   for the field only. */
+body[data-mode="arts"]{height:100%;overflow:hidden}
 body{
   background:radial-gradient(130% 100% at 50% 42%, var(--navy) 0%, #1a2431 34%, var(--ink) 68%, #14161a 100%);
   color:var(--paper);
@@ -306,7 +313,7 @@ body[data-mode="arts"] #toggle:hover{
     <p class="bio">
       Before Prior I took my master&rsquo;s at <a href="https://www.princeton.edu/">Princeton</a>, in the
       <a href="https://cocosci.princeton.edu/">Computational Cognitive Science lab</a> and the
-      Princeton Laboratory for Artificial Intelligence with
+      <a href="https://ai.princeton.edu">Princeton Laboratory for Artificial Intelligence</a> with
       <a href="https://cocosci.princeton.edu/tom/index.php">Tom Griffiths</a>, working on
       meta-learning, few-shot concept learning, and human inductive biases in neural networks.
       Earlier I spent three years as a consultant and software engineer, and studied applied
@@ -319,7 +326,7 @@ body[data-mode="arts"] #toggle:hover{
     <dl class="cv">
       <dt>Princeton University</dt>
       <dd>M.S.E., Computer Science. 2024&ndash;2026.
-          Graduate Fellowship (full tuition and teaching salary).</dd>
+          Graduate Fellowship (full tuition and teaching stipend).</dd>
       <dt>Columbia University</dt>
       <dd>B.A., Applied Mathematics. 2017&ndash;2021.
           Dean&rsquo;s List; Heinrich Research Fellowship; Spritz Family Research Grant.</dd>
@@ -335,6 +342,20 @@ body[data-mode="arts"] #toggle:hover{
         <span class="status">Under review</span>
       </li>
       <li>
+        <span class="au">Gupta, M.</span>, Campbell, D. I., &amp; Griffiths, T. L. (2026).
+        <a href="https://scholar.google.com/citations?view_op=view_citation&amp;hl=en&amp;user=8n1BqYUAAAAJ&amp;citation_for_view=8n1BqYUAAAAJ:5nxA0vEk-isC">Meta-learning
+        captures human-like geometric sensitivity</a>.
+        <span class="ven">Proceedings of the 48th Annual Conference of the Cognitive Science Society.</span>
+      </li>
+      <li>
+        <span class="au">Gupta, M.</span> (2026).
+        <a href="https://www.proquest.com/openview/a7b53e648a8e9a870068081271bfec73/1?pq-origsite=gscholar&amp;cbl=18750&amp;diss=y">Navigating
+        high dimensional concept space with metalearning</a>.
+        <span class="ven">M.S.E. thesis, Princeton University.</span>
+        <span class="note">An earlier version appeared at the ICML 2025 Workshop on
+        High-Dimensional Learning Dynamics.</span>
+      </li>
+      <li>
         <span class="au">Gupta, M.</span>, Rane, S., McCoy, R. T., &amp; Griffiths, T. L. (2025).
         <a href="https://arxiv.org/abs/2503.23212">Convolutional neural networks can (meta-)learn
         the same-different relation</a>.
@@ -347,17 +368,6 @@ body[data-mode="arts"] #toggle:hover{
         <a href="https://arxiv.org/abs/2502.20237">Teasing apart architecture and initial weights
         as sources of inductive bias in neural networks</a>.
         <span class="ven">Proceedings of the 47th Annual Conference of the Cognitive Science Society.</span>
-      </li>
-      <li>
-        <span class="au">Gupta, M.</span> (2025).
-        <a href="https://arxiv.org/abs/2508.01948">Navigating high dimensional concept space with
-        metalearning</a>.
-        <span class="ven">ICML 2025 Workshop on High-Dimensional Learning Dynamics.</span>
-      </li>
-      <li>
-        Hawkins, R. D., <span class="au">Gupta, M.</span>, Fang, K., Wu, C. M., &amp; Franke, M. (2025).
-        Networks with pragmatic listeners are less vulnerable to misinformation.
-        <span class="ven">Society for Personality and Social Psychology Annual Convention.</span>
       </li>
       <li>
         Azizi, E., Azad, T., <span class="au">Gupta, M.</span>, &amp; Nazaret, A.
@@ -1921,6 +1931,7 @@ function applyMode(next,remember){
   toggleEl.setAttribute("aria-label",isArts?"Switch to the science page":"Switch to the arts field");
   document.title=isArts?"max gupta — arts":"Max Gupta";
   if(isArts){
+    if(window.scrollTo) window.scrollTo(0,0);   /* one screen — never land mid-page */
     if(!booted){ init(); }     /* first visit: build the field, now that it has size */
     else { refit(); }          /* later visits: it may have been resized while away */
     start();
